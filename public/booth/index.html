@@ -2,85 +2,126 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
+<!-- viewport-fit=cover lets the booth fill the whole screen edge-to-edge on iPad/iPhone notches -->
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Photobooth</title>
 <meta name="robots" content="noindex">
-<link rel="stylesheet" href="/assets/css/app.css">
+<link rel="stylesheet" href="/assets/vendor/bulma/bulma.min.css">
+<link rel="stylesheet" href="/assets/vendor/bootstrap-icons/bootstrap-icons.min.css">
 <link rel="stylesheet" href="/assets/css/booth.css">
 </head>
 <body>
+<!--
+  This is a single-page, single-screen kiosk UI: every step below is a
+  sibling ".screen" div, and booth.js shows exactly one at a time by
+  toggling the "is-active" class (see showScreen() in booth.js).
+-->
 <div class="booth-shell" id="booth-shell">
 
-  <div class="screen active" id="screen-loading">
-    <p class="muted">Loading&hellip;</p>
+  <div class="screen is-active" id="screen-loading">
+    <p class="has-text-grey-light">Loading&hellip;</p>
   </div>
 
   <div class="screen" id="screen-error">
-    <p class="error-text" id="error-message">Something went wrong.</p>
+    <p class="notification is-danger" id="error-message">Something went wrong.</p>
   </div>
 
   <div class="screen" id="screen-full">
-    <img class="booth-logo hidden" id="full-logo">
-    <p class="full-message">This event is full &mdash; thanks for stopping by! Ask an event host for help.</p>
+    <img class="booth-logo is-hidden" id="full-logo">
+    <p class="title is-4">This event is full &mdash; thanks for stopping by!</p>
+    <p class="subtitle is-6">Ask an event host for help.</p>
   </div>
 
+  <!-- Step 1: welcome screen, guest picks single photo or multi-shot strip. -->
   <div class="screen" id="screen-start">
-    <img class="booth-logo hidden" id="start-logo">
-    <h1 class="booth-title" id="event-name"></h1>
-    <p class="booth-subtitle">Tap to start</p>
-    <div class="choice-row">
-      <button class="choice-btn" id="choose-single">📷 Single Photo</button>
-      <button class="choice-btn" id="choose-strip">🎞️ Photo Strip</button>
+    <img class="booth-logo is-hidden" id="start-logo">
+    <h1 class="title is-2" id="event-name"></h1>
+    <p class="subtitle">Tap to start</p>
+    <div class="buttons">
+      <button class="button is-primary is-large" id="choose-single">
+        <span class="icon"><i class="bi bi-camera-fill"></i></span>
+        <span>Single Photo</span>
+      </button>
+      <button class="button is-primary is-large" id="choose-strip">
+        <span class="icon"><i class="bi bi-images"></i></span>
+        <span>Photo Strip</span>
+      </button>
     </div>
   </div>
 
+  <!-- Step 2: live camera + countdown, one or more shots depending on choice. -->
   <div class="screen" id="screen-camera">
     <div class="camera-wrap">
       <video id="video" autoplay playsinline muted></video>
-      <div class="countdown-overlay hidden" id="countdown"></div>
+      <div class="countdown-overlay is-hidden" id="countdown"></div>
     </div>
-    <p class="muted" id="shot-progress"></p>
+    <p class="has-text-grey-light mt-3" id="shot-progress"></p>
   </div>
 
+  <!-- Step 3: review the branded composite, retake or continue. -->
   <div class="screen" id="screen-preview">
     <img class="result-image" id="result-image">
-    <div class="action-row">
-      <button class="secondary" id="retake-btn">Retake</button>
-      <button id="continue-btn">Use this photo</button>
+    <div class="buttons mt-4">
+      <button class="button" id="retake-btn">
+        <span class="icon"><i class="bi bi-arrow-counterclockwise"></i></span>
+        <span>Retake</span>
+      </button>
+      <button class="button is-primary" id="continue-btn">
+        <span class="icon"><i class="bi bi-check-lg"></i></span>
+        <span>Use this photo</span>
+      </button>
     </div>
   </div>
 
   <div class="screen" id="screen-uploading">
-    <p class="muted">Saving your photo&hellip;</p>
+    <p class="has-text-grey-light">Saving your photo&hellip;</p>
   </div>
 
+  <!-- Step 4: delivery — QR code, email, print. No native OS share sheet (spec). -->
   <div class="screen" id="screen-delivery">
-    <img class="result-image" id="delivery-image">
-    <div class="delivery-options">
-      <div class="card delivery-card">
-        <div>Scan for your photo</div>
-        <img class="qr" id="qr-image" alt="QR code">
+    <img class="result-image mb-4" id="delivery-image">
+    <div class="columns is-mobile is-centered is-multiline">
+      <div class="column is-narrow">
+        <div class="box delivery-card has-text-centered">
+          <p><i class="bi bi-qr-code mr-1"></i> Scan for your photo</p>
+          <img class="qr-code mt-2" id="qr-image" alt="QR code linking to your photo">
+        </div>
       </div>
-      <div class="card delivery-card">
-        <div>Email it to yourself</div>
-        <form id="email-form">
-          <input type="email" id="email-input" placeholder="you@example.com" required>
-          <div style="margin-top:0.75rem;">
-            <button type="submit">Send</button>
-          </div>
-          <div id="email-status" class="muted" style="margin-top:0.5rem;"></div>
-        </form>
+      <div class="column is-narrow">
+        <div class="box delivery-card has-text-centered">
+          <p><i class="bi bi-envelope mr-1"></i> Email it to yourself</p>
+          <form id="email-form" class="mt-2">
+            <div class="field has-addons">
+              <div class="control">
+                <input class="input" type="email" id="email-input" placeholder="you@example.com" required>
+              </div>
+              <div class="control">
+                <button type="submit" class="button is-link">
+                  <span class="icon"><i class="bi bi-send"></i></span>
+                </button>
+              </div>
+            </div>
+            <p class="help" id="email-status"></p>
+          </form>
+        </div>
       </div>
     </div>
-    <div class="action-row">
-      <button class="secondary" id="print-btn">🖨️ Print</button>
-      <button id="new-session-btn">Start over</button>
+    <div class="buttons mt-4">
+      <button class="button" id="print-btn">
+        <span class="icon"><i class="bi bi-printer"></i></span>
+        <span>Print</span>
+      </button>
+      <button class="button is-primary" id="new-session-btn">
+        <span class="icon"><i class="bi bi-arrow-repeat"></i></span>
+        <span>Start over</span>
+      </button>
     </div>
   </div>
 
 </div>
 
-<img id="print-image" style="display:none;">
+<!-- Off-screen image swapped in only for @media print (see booth.css). -->
+<img id="print-image" class="is-hidden">
 
 <script src="/assets/js/booth.js"></script>
 </body>

@@ -4,8 +4,10 @@ declare(strict_types=1);
 
 namespace Photobooth\Support;
 
+/** Id generation: proper UUIDv4s for internal record ids (events, photos), plus a short human-typeable code for booth URLs. */
 final class Uuid
 {
+    /** Standard RFC 4122 UUIDv4 (e.g. event/photo primary identifiers). */
     public static function v4(): string
     {
         $data = random_bytes(16);

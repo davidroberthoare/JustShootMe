@@ -10,6 +10,12 @@ use Psr\Http\Message\ServerRequestInterface as Request;
 use Psr\Http\Server\MiddlewareInterface;
 use Psr\Http\Server\RequestHandlerInterface as Handler;
 
+/**
+ * Gatekeeper for the /api/admin/* route group (see routes.php). Rejects the
+ * request with 401 before it ever reaches the controller if there's no
+ * logged-in admin session (set by AuthController::login). Session_start()
+ * itself happens once in public/index.php, before routing.
+ */
 final class AdminAuthMiddleware implements MiddlewareInterface
 {
     public function __construct(private readonly ResponseFactoryInterface $responseFactory)

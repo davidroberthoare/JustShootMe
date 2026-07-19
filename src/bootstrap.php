@@ -17,6 +17,13 @@ use Photobooth\Support\{Config, Database};
 use Slim\App;
 use Slim\Factory\AppFactory;
 
+/*
+ * Application bootstrap: loads config, wires the DI container (php-di) with
+ * every service/controller/middleware the routes need, and returns a ready
+ * Slim App. Included once by public/index.php, before src/routes.php
+ * registers the actual routes on it.
+ */
+
 require_once __DIR__ . '/../vendor/autoload.php';
 
 $rootPath = dirname(__DIR__);

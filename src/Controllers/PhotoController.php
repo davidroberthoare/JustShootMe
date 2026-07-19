@@ -10,6 +10,16 @@ use Photobooth\Support\Uuid;
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
 
+/**
+ * Everything to do with an individual photo: the guest's upload after
+ * capture (upload()), streaming the file back out (media()), the "your
+ * photo" page's metadata (show()), its QR code (qr()), and emailing a copy
+ * (email()). Photos are addressed by an unguessable UUID rather than a
+ * sequential id — that UUID *is* the access control (no login needed to
+ * view/download your own photo), so never expose a route that lists all
+ * photo UUIDs for an event to anyone but the event's own admin (that's
+ * GalleryController, which is auth-gated).
+ */
 final class PhotoController extends BaseController
 {
     public function __construct(
@@ -56,6 +66,8 @@ final class PhotoController extends BaseController
         $photoUuid = Uuid::v4();
         $destination = $this->storage->photoPath($event['uuid'], $photoUuid, 'jpg');
 
+        // ImageService decodes + re-encodes through GD before anything touches
+        // disk — the uploaded data URL is never trusted/written as-is.
         try {
             $sizeBytes = $this->images->saveDataUrl($dataUrl, $destination);
         } catch (\RuntimeException $e) {
@@ -170,6 +182,7 @@ final class PhotoController extends BaseController
         return $this->json($response, ['sent' => $sent]);
     }
 
+    /** Looks up a photo by its public UUID, joined with its event for the name/uuid the other methods need. */
     private function findPhoto(string $uuid): array|false
     {
         $stmt = $this->pdo->prepare(

@@ -5,29 +5,55 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Your Photo</title>
 <meta name="robots" content="noindex">
-<link rel="stylesheet" href="/assets/css/app.css">
-<style>
-  body { display:flex; align-items:center; justify-content:center; min-height:100vh; padding:1.5rem; }
-  .wrap { max-width: 480px; width: 100%; text-align: center; }
-  img { max-width: 100%; border-radius: 14px; box-shadow: 0 10px 40px rgba(0,0,0,0.5); }
-  .actions { margin-top: 1.25rem; display:flex; gap:0.75rem; justify-content:center; flex-wrap:wrap; }
-</style>
+<link rel="stylesheet" href="/assets/vendor/bulma/bulma.min.css">
+<link rel="stylesheet" href="/assets/vendor/bootstrap-icons/bootstrap-icons.min.css">
+<!--
+  No app-specific CSS file needed on this page: Bulma's hero/columns
+  handle the centred responsive layout, and .box already supplies the
+  rounded corners + shadow around the photo.
+-->
 </head>
 <body>
-<div class="wrap">
-  <div id="status" class="muted">Loading your photo&hellip;</div>
-  <img id="photo" class="hidden">
-  <div class="actions hidden" id="actions">
-    <a id="download-link" download="photo.jpg"><button>Download</button></a>
+<section class="hero is-fullheight">
+  <div class="hero-body">
+    <div class="container">
+      <div class="columns is-centered">
+        <div class="column is-5-tablet is-4-desktop has-text-centered">
+
+          <p id="status" class="has-text-grey">Loading your photo&hellip;</p>
+
+          <div class="box is-hidden" id="photo-box">
+            <figure class="image">
+              <img id="photo" alt="Your photobooth photo">
+            </figure>
+            <div class="buttons is-centered mt-4">
+              <a id="download-link" download="photo.jpg">
+                <button class="button is-primary">
+                  <span class="icon"><i class="bi bi-download"></i></span>
+                  <span>Download</span>
+                </button>
+              </a>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
   </div>
-</div>
+</section>
+
 <script>
+/**
+ * Guest photo page — the destination of the QR code shown at the booth
+ * (see booth.js) and of the "email me a copy" link (see MailService).
+ * Shows just this one guest's photo, never the full event gallery (spec).
+ */
 (async function () {
   const params = new URLSearchParams(window.location.search);
   const id = params.get('id');
   const statusEl = document.getElementById('status');
+  const box = document.getElementById('photo-box');
   const img = document.getElementById('photo');
-  const actions = document.getElementById('actions');
 
   if (!id) {
     statusEl.textContent = 'No photo specified.';
@@ -41,10 +67,9 @@
 
     document.title = `Photo — ${data.photo.event_name}`;
     img.src = data.photo.image_url;
-    img.classList.remove('hidden');
     document.getElementById('download-link').href = data.photo.image_url;
-    actions.classList.remove('hidden');
-    statusEl.classList.add('hidden');
+    box.classList.remove('is-hidden');
+    statusEl.classList.add('is-hidden');
   } catch (err) {
     statusEl.textContent = err.message;
   }

@@ -9,7 +9,7 @@ this README covers what's implemented and how to run it.
 
 - **Backend:** PHP 8.1+, [Slim 4](https://www.slimframework.com/) for routing/middleware, raw PDO for persistence (no ORM).
 - **Database:** SQLite by default (zero-config, single file at `storage/photobooth.sqlite`). Swappable to MySQL/Postgres later by changing the DSN in `src/Support/Database.php` — the schema in `database/schema.sql` avoids SQLite-only syntax where practical.
-- **Frontend:** Plain HTML/CSS/JS, no framework or build step.
+- **Frontend:** Plain HTML/JS, no framework or build step. Styling is [Bulma](https://bulma.io/) (CSS-only, no JS, mobile-first/responsive by default) plus [Bootstrap Icons](https://icons.getbootstrap.com/) (MIT-licensed SVG/webfont icon set) — both vendored directly into `public/assets/vendor/` (see below) rather than hand-rolled CSS, so there's no design system to maintain by hand.
 - **Email:** Amazon SES via its SMTP interface (through PHPMailer).
 - **Images:** GD (bundled with PHP) for logo/photo re-encoding.
 
@@ -21,6 +21,9 @@ public/            Web root. Static pages (booth/, admin/, photo/) + index.php f
   admin/            Admin dashboard (session-cookie auth)
   photo/            "Your photo" page a QR code links to
   assets/           Shared css/js for the above
+    vendor/           Bulma + Bootstrap Icons, vendored (not npm/CDN — see Styling below)
+    css/              Small app-specific overrides only (see comments in each file)
+    js/               admin.js, booth.js — no build step, loaded as plain <script> tags
   media/, archive/  Routed through Slim (src/routes.php), not real directories
 src/
   Controllers/      One class per route group (Auth, Event, Photo, Gallery, Archive, Media)
@@ -86,6 +89,38 @@ equivalent is a `try_files $uri $uri/ /index.php?$query_string;` rule.
 
 Set up the retention cron (see below) and, optionally, the OS-level backstop
 script in your crontab.
+
+## Styling
+
+All three pages (`admin/`, `booth/`, `photo/`) load two vendored, self-hosted
+libraries rather than hand-coded CSS:
+
+- **[Bulma](https://bulma.io/)** (`public/assets/vendor/bulma/bulma.min.css`)
+  — a CSS-only framework (no JS), responsive/mobile-first by default, which
+  is why the booth works unmodified on phones, tablets, and an event iPad.
+  All layout, forms, buttons, cards, and colours come from its classes
+  (`box`, `card`, `field`/`control`, `button is-primary`, `is-hidden`,
+  Bulma's own dark-mode support, etc.).
+- **[Bootstrap Icons](https://icons.getbootstrap.com/)**
+  (`public/assets/vendor/bootstrap-icons/`) — an open-source (MIT), webfont-
+  based icon set. Icons are just `<i class="bi bi-camera-fill"></i>` tags.
+
+Both are vendored directly into the repo (not pulled from a CDN or via npm)
+so the booth still works if an event's wifi is flaky and the app doesn't
+need a JS build step. To upgrade either library, download a newer release
+and replace the files under `public/assets/vendor/{bulma,bootstrap-icons}/`
+— see the `LICENSE` file alongside each for attribution terms.
+
+The only custom CSS in the app is `public/assets/css/admin.css` and
+`booth.css`, and both are deliberately small: they hold *only* the handful
+of things Bulma has no component for (the fullscreen mirrored camera view
+and countdown overlay on the booth, the photo thumbnail grid on the admin
+gallery, print-only output rules). Every file starts with a comment
+explaining why it exists — read that comment before adding a new rule, and
+prefer an existing Bulma class first. The one legitimate use of an inline
+style is the admin-configured event background colour, which is genuinely
+per-event *data* (like an `<img src>`) rather than a design choice, so it's
+set at runtime in JS (`booth.js`, `admin.js`) instead of being a CSS rule.
 
 ## How it works
 

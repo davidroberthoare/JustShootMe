@@ -5,75 +5,162 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Photobooth Admin</title>
 <meta name="robots" content="noindex">
-<link rel="stylesheet" href="/assets/css/app.css">
+<link rel="stylesheet" href="/assets/vendor/bulma/bulma.min.css">
+<link rel="stylesheet" href="/assets/vendor/bootstrap-icons/bootstrap-icons.min.css">
 <link rel="stylesheet" href="/assets/css/admin.css">
 </head>
 <body>
 
-<div id="login-view" class="card hidden">
-  <h1>Photobooth Admin</h1>
-  <form id="login-form">
-    <label for="login-email">Email</label>
-    <input type="email" id="login-email" required autocomplete="username">
-    <label for="login-password">Password</label>
-    <input type="password" id="login-password" required autocomplete="current-password">
-    <div style="margin-top:1.25rem;">
-      <button type="submit">Log in</button>
-    </div>
-    <div id="login-error" class="error-text hidden"></div>
-  </form>
-</div>
-
-<div id="dashboard-view" class="admin-shell hidden">
-  <div class="admin-header">
-    <h1>Photobooth Admin</h1>
-    <div>
-      <span id="admin-email" class="muted"></span>
-      <button class="secondary" id="logout-btn">Log out</button>
-    </div>
-  </div>
-
-  <div id="events-list-view">
-    <div class="card">
-      <h2 style="margin-top:0;">New event</h2>
-      <form id="create-event-form">
-        <label for="event-name">Event name</label>
-        <input type="text" id="event-name" required>
-
-        <label for="event-bg-color">Background colour</label>
-        <input type="text" id="event-bg-color" value="#111111">
-
-        <label for="event-logo">Logo (optional)</label>
-        <input type="file" id="event-logo" accept="image/*">
-
-        <label for="event-photo-cap">Photo cap (0 = unlimited)</label>
-        <input type="number" id="event-photo-cap" min="0" placeholder="default from server config">
-
-        <label for="event-storage-cap">Storage cap, MB (0 = unlimited)</label>
-        <input type="number" id="event-storage-cap" min="0" placeholder="default from server config">
-
-        <div style="margin-top:1.25rem;">
-          <button type="submit">Create event</button>
+<section id="login-view" class="hero is-fullheight is-hidden">
+  <div class="hero-body">
+    <div class="container">
+      <div class="columns is-centered">
+        <div class="column is-4">
+          <div class="box">
+            <h1 class="title is-4 has-text-centered">
+              <i class="bi bi-camera-fill mr-2"></i> Photobooth Admin
+            </h1>
+            <form id="login-form">
+              <div class="field">
+                <label class="label" for="login-email">Email</label>
+                <div class="control has-icons-left">
+                  <input class="input" type="email" id="login-email" required autocomplete="username">
+                  <span class="icon is-small is-left"><i class="bi bi-envelope"></i></span>
+                </div>
+              </div>
+              <div class="field">
+                <label class="label" for="login-password">Password</label>
+                <div class="control has-icons-left">
+                  <input class="input" type="password" id="login-password" required autocomplete="current-password">
+                  <span class="icon is-small is-left"><i class="bi bi-lock"></i></span>
+                </div>
+              </div>
+              <div class="field mt-5">
+                <button type="submit" class="button is-link is-fullwidth">
+                  <span class="icon"><i class="bi bi-box-arrow-in-right"></i></span>
+                  <span>Log in</span>
+                </button>
+              </div>
+              <p id="login-error" class="help is-danger is-hidden"></p>
+            </form>
+          </div>
         </div>
-        <div id="create-event-error" class="error-text hidden"></div>
-      </form>
-    </div>
-
-    <h2>Events</h2>
-    <div id="event-grid" class="event-grid"></div>
-  </div>
-
-  <div id="event-detail-view" class="hidden">
-    <span class="back-link" id="back-to-events">&larr; All events</span>
-    <div class="card">
-      <h2 id="detail-event-name" style="margin-top:0;"></h2>
-      <div id="detail-booth-url" class="booth-url-box"></div>
-      <div class="progress-row" id="detail-stats"></div>
-      <div class="actions" style="margin-top:1rem;">
-        <a id="detail-download-link"><button class="secondary">Download all photos (.zip)</button></a>
       </div>
     </div>
-    <div id="detail-photo-grid" class="photo-grid"></div>
+  </div>
+</section>
+
+<div id="dashboard-view" class="is-hidden">
+  <nav class="navbar is-link" role="navigation">
+    <div class="container">
+      <div class="navbar-brand">
+        <span class="navbar-item">
+          <i class="bi bi-camera-fill mr-2"></i> <strong>Photobooth Admin</strong>
+        </span>
+      </div>
+      <div class="navbar-menu">
+        <div class="navbar-end">
+          <span class="navbar-item" id="admin-email"></span>
+          <div class="navbar-item">
+            <button class="button is-link is-inverted" id="logout-btn">
+              <span class="icon"><i class="bi bi-box-arrow-right"></i></span>
+              <span>Log out</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <div class="container py-5 px-4">
+
+    <div id="events-list-view">
+      <div class="box">
+        <h2 class="title is-5"><i class="bi bi-plus-circle mr-2"></i>New event</h2>
+        <form id="create-event-form">
+          <div class="columns is-multiline">
+            <div class="column is-6">
+              <div class="field">
+                <label class="label" for="event-name">Event name</label>
+                <div class="control">
+                  <input class="input" type="text" id="event-name" required>
+                </div>
+              </div>
+            </div>
+            <div class="column is-6">
+              <div class="field">
+                <label class="label" for="event-bg-color">Background colour</label>
+                <div class="control">
+                  <input class="input" type="color" id="event-bg-color" value="#111111">
+                </div>
+              </div>
+            </div>
+            <div class="column is-6">
+              <div class="field">
+                <label class="label" for="event-logo">Logo (optional)</label>
+                <div class="file has-name is-fullwidth">
+                  <label class="file-label">
+                    <input class="file-input" type="file" id="event-logo" accept="image/*">
+                    <span class="file-cta">
+                      <span class="file-icon"><i class="bi bi-image"></i></span>
+                      <span class="file-label">Choose a logo&hellip;</span>
+                    </span>
+                    <span class="file-name" id="event-logo-name">No file selected</span>
+                  </label>
+                </div>
+              </div>
+            </div>
+            <div class="column is-3">
+              <div class="field">
+                <label class="label" for="event-photo-cap">Photo cap</label>
+                <div class="control">
+                  <input class="input" type="number" id="event-photo-cap" min="0" placeholder="server default">
+                </div>
+              </div>
+            </div>
+            <div class="column is-3">
+              <div class="field">
+                <label class="label" for="event-storage-cap">Storage cap (MB)</label>
+                <div class="control">
+                  <input class="input" type="number" id="event-storage-cap" min="0" placeholder="server default">
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="field mt-3">
+            <button type="submit" class="button is-primary">
+              <span class="icon"><i class="bi bi-check-circle"></i></span>
+              <span>Create event</span>
+            </button>
+          </div>
+          <p id="create-event-error" class="help is-danger is-hidden"></p>
+        </form>
+      </div>
+
+      <h2 class="title is-5 mt-5"><i class="bi bi-calendar-event mr-2"></i>Events</h2>
+      <div id="event-grid" class="columns is-multiline"></div>
+    </div>
+
+    <div id="event-detail-view" class="is-hidden">
+      <a class="is-flex is-align-items-center mb-4" id="back-to-events">
+        <i class="bi bi-arrow-left mr-2"></i> All events
+      </a>
+      <div class="box">
+        <h2 class="title is-5" id="detail-event-name"></h2>
+        <div class="field has-addons" id="detail-booth-url"></div>
+        <p class="is-size-7 has-text-grey" id="detail-stats"></p>
+        <div class="field mt-4">
+          <a id="detail-download-link">
+            <button class="button">
+              <span class="icon"><i class="bi bi-download"></i></span>
+              <span>Download all photos (.zip)</span>
+            </button>
+          </a>
+        </div>
+      </div>
+      <div id="detail-photo-grid" class="photo-grid"></div>
+    </div>
+
   </div>
 </div>
 

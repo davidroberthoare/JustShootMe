@@ -11,6 +11,13 @@ use Psr\Http\Message\ServerRequestInterface as Request;
 use Slim\Psr7\Stream;
 use ZipArchive;
 
+/**
+ * The admin-only view of an event's photos: the gallery list (index()) and
+ * a one-off bulk zip of the *live* gallery (download()). This is distinct
+ * from ArchiveController, which streams the zip the retention cron already
+ * built for an *archived* event — this one builds a fresh zip on demand
+ * from whatever's currently in storage/events/{uuid}/.
+ */
 final class GalleryController extends BaseController
 {
     public function __construct(
@@ -19,7 +26,7 @@ final class GalleryController extends BaseController
     ) {
     }
 
-    /** GET /api/admin/events/{id}/photos */
+    /** GET /api/admin/events/{id}/photos — thumbnail grid data for the admin dashboard. */
     public function index(Request $request, Response $response, array $args): Response
     {
         $event = $this->findOwnedEvent((int) $args['id']);
@@ -76,6 +83,7 @@ final class GalleryController extends BaseController
         // registering a stream-close callback to unlink() it immediately after send.
     }
 
+    /** Fetches an event by id, but only if it belongs to the logged-in admin — same access-control choke point as EventController. */
     private function findOwnedEvent(int $id): array|false
     {
         $stmt = $this->pdo->prepare('SELECT * FROM events WHERE id = ? AND admin_id = ?');

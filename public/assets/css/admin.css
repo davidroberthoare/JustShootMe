@@ -1,69 +1,13 @@
-.admin-shell {
-    max-width: 1100px;
-    margin: 0 auto;
-    padding: 2rem 1.25rem 4rem;
-}
+/*
+ * Admin dashboard overrides.
+ *
+ * This file intentionally stays tiny: Bulma (public/assets/vendor/bulma)
+ * handles layout, forms, buttons, cards, colours, and dark-mode support.
+ * Only add rules here for things Bulma genuinely has no component for.
+ */
 
-.admin-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 1.5rem;
-}
-
-.admin-header h1 { font-size: 1.4rem; margin: 0; }
-
-#login-view {
-    max-width: 360px;
-    margin: 4rem auto;
-}
-
-.event-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-    gap: 1rem;
-    margin-top: 1.25rem;
-}
-
-.event-card h3 { margin: 0 0 0.25rem; }
-
-.event-card .badge {
-    display: inline-block;
-    font-size: 0.7rem;
-    text-transform: uppercase;
-    letter-spacing: 0.04em;
-    padding: 0.15rem 0.5rem;
-    border-radius: 999px;
-    background: var(--pb-surface-2);
-    color: var(--pb-text-dim);
-    margin-bottom: 0.5rem;
-}
-
-.event-card .badge.active { color: var(--pb-success); }
-
-.progress-row {
-    font-size: 0.8rem;
-    color: var(--pb-text-dim);
-    margin-top: 0.5rem;
-}
-
-.event-card .actions {
-    display: flex;
-    gap: 0.5rem;
-    margin-top: 0.85rem;
-    flex-wrap: wrap;
-}
-
-.booth-url-box {
-    display: flex;
-    gap: 0.4rem;
-    margin-top: 0.5rem;
-}
-
-.booth-url-box input {
-    font-size: 0.8rem;
-}
-
+/* Bulma has no built-in photo-thumbnail grid; a plain responsive CSS grid
+   is simpler here than forcing Bulma's 12-column `columns` grid to do it. */
 .photo-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
@@ -75,22 +19,27 @@
     width: 100%;
     aspect-ratio: 1 / 1;
     object-fit: cover;
-    border-radius: 8px;
-    border: 1px solid var(--pb-border);
+    border-radius: 6px;
 }
 
-.back-link {
-    display: inline-block;
-    margin-bottom: 1rem;
+#back-to-events {
     cursor: pointer;
 }
 
+/* Small swatch showing an event's admin-chosen background colour. The
+   colour itself is per-event data, not a design token, so it's set via an
+   inline style in admin.js — only the swatch's shape lives here. */
 .color-swatch {
     display: inline-block;
-    width: 1.1rem;
-    height: 1.1rem;
-    border-radius: 4px;
+    width: 0.9em;
+    height: 0.9em;
+    border-radius: 3px;
     vertical-align: middle;
-    margin-right: 0.4rem;
-    border: 1px solid var(--pb-border);
+    margin-right: 0.4em;
+    border: 1px solid rgba(0, 0, 0, 0.2);
+}
+
+/* The booth URL is shown read-only next to a copy button (Bulma "field has-addons"). */
+#detail-booth-url .input {
+    font-size: 0.85rem;
 }

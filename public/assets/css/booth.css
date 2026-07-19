@@ -1,8 +1,21 @@
+/*
+ * Booth (guest-facing) overrides.
+ *
+ * Bulma (public/assets/vendor/bulma) supplies buttons, form controls, and
+ * cards. What's left here is specific to a fullscreen kiosk photo-capture
+ * UI that Bulma doesn't model: a fullscreen mirrored camera view, a
+ * countdown number overlaid on top of it, one-screen-at-a-time step
+ * switching, and print-only output.
+ */
+
 html, body {
     height: 100%;
+    /* Kiosk mode: no scrolling, this is a single fullscreen screen at a time. */
     overflow: hidden;
 }
 
+/* The whole booth is one fullscreen coloured stage; the colour itself is
+   the event's branding colour, set at runtime by booth.js. */
 .booth-shell {
     height: 100vh;
     width: 100vw;
@@ -15,8 +28,19 @@ html, body {
     transition: background-color 0.3s ease;
 }
 
-.screen { display: none; width: 100%; max-width: 720px; }
-.screen.active { display: flex; flex-direction: column; align-items: center; }
+/* Only one .screen is visible at a time; booth.js toggles the `is-active`
+   class to move the guest through: start -> camera -> preview -> delivery. */
+.screen {
+    display: none;
+    width: 100%;
+    max-width: 720px;
+}
+
+.screen.is-active {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
 
 .booth-logo {
     max-width: 220px;
@@ -25,37 +49,28 @@ html, body {
     object-fit: contain;
 }
 
-.booth-title {
-    font-size: 1.8rem;
-    font-weight: 700;
-    margin: 0 0 0.5rem;
+/* Live camera preview is mirrored (like a real mirror/photobooth), but the
+   captured frame itself is un-mirrored in booth.js so the final photo
+   reads correctly (e.g. text in the background isn't backwards). */
+#video {
+    transform: scaleX(-1);
 }
 
-.booth-subtitle { color: var(--pb-text-dim); margin-bottom: 2rem; }
-
-.choice-row {
-    display: flex;
-    gap: 1rem;
-    flex-wrap: wrap;
-    justify-content: center;
-}
-
-.choice-btn {
-    padding: 1.5rem 2rem;
-    font-size: 1.1rem;
-    min-width: 220px;
-}
-
-video, canvas.preview-canvas {
+video,
+.result-image {
     width: 100%;
     max-width: 560px;
     border-radius: 14px;
     background: #000;
-    transform: scaleX(-1); /* mirror the live preview so it feels like a mirror */
 }
 
-canvas.final-canvas { transform: none; }
+.camera-wrap {
+    position: relative;
+    width: 100%;
+    max-width: 560px;
+}
 
+/* Big countdown number ("3… 2… 1…") layered on top of the live video. */
 .countdown-overlay {
     position: absolute;
     inset: 0;
@@ -65,50 +80,34 @@ canvas.final-canvas { transform: none; }
     font-size: 8rem;
     font-weight: 800;
     color: white;
-    text-shadow: 0 0 30px rgba(0,0,0,0.6);
+    text-shadow: 0 0 30px rgba(0, 0, 0, 0.6);
     pointer-events: none;
 }
 
-.camera-wrap { position: relative; width: 100%; max-width: 560px; }
-
 .result-image {
-    max-width: 100%;
     max-height: 55vh;
-    border-radius: 14px;
-    box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
 }
 
-.action-row {
-    display: flex;
-    gap: 0.75rem;
-    margin-top: 1.5rem;
-    flex-wrap: wrap;
-    justify-content: center;
+.delivery-card img.qr-code {
+    width: 180px;
+    height: 180px;
 }
-
-.delivery-options {
-    display: flex;
-    gap: 2rem;
-    flex-wrap: wrap;
-    justify-content: center;
-    margin-top: 1.5rem;
-}
-
-.delivery-card {
-    padding: 1.5rem;
-    min-width: 220px;
-}
-
-.delivery-card img.qr { width: 180px; height: 180px; margin-top: 0.75rem; }
 
 .full-message {
-    font-size: 1.4rem;
     max-width: 480px;
 }
 
+/* Printing (AirPrint etc.) should output just the captured photo, full
+   bleed, nothing else from the page. */
 @media print {
-    body * { visibility: hidden; }
-    #print-image, #print-image * { visibility: visible; }
+    body * {
+        visibility: hidden;
+    }
+    #print-image,
+    #print-image * {
+        visibility: visible;
+    }
     #print-image {
         position: fixed;
         inset: 0;

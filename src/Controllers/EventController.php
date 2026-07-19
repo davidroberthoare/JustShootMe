@@ -10,6 +10,14 @@ use Photobooth\Support\Uuid;
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
 
+/**
+ * Event CRUD for admins (create/list/view), plus the one public,
+ * unauthenticated endpoint the booth frontend calls to load an event's
+ * branding by its short booth code (publicConfig()). Every admin-facing
+ * method here is scoped to the logged-in admin's own events via
+ * findOwnedEvent() — there's no route that lets one admin see another's
+ * events.
+ */
 final class EventController extends BaseController
 {
     public function __construct(
@@ -20,7 +28,7 @@ final class EventController extends BaseController
     ) {
     }
 
-    /** GET /api/admin/events */
+    /** GET /api/admin/events — list this admin's events, newest first. */
     public function index(Request $request, Response $response): Response
     {
         $stmt = $this->pdo->prepare(
@@ -48,6 +56,9 @@ final class EventController extends BaseController
     /** POST /api/admin/events (multipart/form-data: name, background_color, photo_cap?, storage_cap_mb?, logo?) */
     public function create(Request $request, Response $response): Response
     {
+        // Spec decision: when the server-wide storage cap is reached, block
+        // new event creation and surface it to the admin, rather than
+        // silently purging some other admin's event to make room.
         if ($this->storage->wouldExceedGlobalCap($this->pdo)) {
             return $this->error(
                 $response,
@@ -85,6 +96,8 @@ final class EventController extends BaseController
             $tmpPath = sys_get_temp_dir() . '/' . Uuid::v4();
             $logoFile->moveTo($tmpPath);
 
+            // ImageService re-encodes through GD (never trusts the raw upload
+            // bytes) and writes straight into permanent storage as PNG.
             $destination = $this->storage->logoPath($uuid, 'png');
             $this->images->saveUploadedLogo($tmpPath, $destination);
             @unlink($tmpPath);
@@ -131,6 +144,9 @@ final class EventController extends BaseController
             return $this->error($response, 'Unknown booth code.', 404);
         }
 
+        // A cap of 0 means "unlimited" for that dimension (see .env.example);
+        // an archived/purged event also reads as full so the booth stops
+        // accepting captures once the retention cron has moved it along.
         $isFull = $event['status'] !== 'active'
             || ($event['photo_cap'] > 0 && $event['photo_count'] >= $event['photo_cap'])
             || ($event['storage_cap_bytes'] > 0 && $event['storage_used_bytes'] >= $event['storage_cap_bytes']);
@@ -146,6 +162,7 @@ final class EventController extends BaseController
         ]);
     }
 
+    /** Fetches an event by id, but only if it belongs to the logged-in admin — the access-control choke point for this controller. */
     private function findOwnedEvent(int $id): array|false
     {
         $stmt = $this->pdo->prepare('SELECT * FROM events WHERE id = ? AND admin_id = ?');
@@ -153,6 +170,7 @@ final class EventController extends BaseController
         return $stmt->fetch();
     }
 
+    /** Keeps generating a short random code (see Uuid::boothCode()) until one isn't already in use. */
     private function generateUniqueBoothCode(): string
     {
         do {
@@ -164,6 +182,7 @@ final class EventController extends BaseController
         return $code;
     }
 
+    /** Shapes a raw events-table row into the JSON the admin frontend expects. */
     private function present(array $event): array
     {
         return [
