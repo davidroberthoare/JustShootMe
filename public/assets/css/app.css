@@ -1,0 +1,83 @@
+:root {
+    --pb-bg: #0f1115;
+    --pb-surface: #171a21;
+    --pb-surface-2: #1f232c;
+    --pb-border: #2b303b;
+    --pb-text: #e8eaee;
+    --pb-text-dim: #9aa1ad;
+    --pb-accent: #6d8dff;
+    --pb-accent-hover: #8aa2ff;
+    --pb-danger: #ff6d6d;
+    --pb-success: #4fd18b;
+    --pb-radius: 10px;
+    font-size: 16px;
+}
+
+* { box-sizing: border-box; }
+
+body {
+    margin: 0;
+    background: var(--pb-bg);
+    color: var(--pb-text);
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+}
+
+a { color: var(--pb-accent); }
+
+button, input, select {
+    font-family: inherit;
+    font-size: 1rem;
+}
+
+button {
+    cursor: pointer;
+    border: none;
+    border-radius: var(--pb-radius);
+    padding: 0.65rem 1.1rem;
+    background: var(--pb-accent);
+    color: #0c0f14;
+    font-weight: 600;
+    transition: background 0.15s ease;
+}
+
+button:hover { background: var(--pb-accent-hover); }
+button:disabled { opacity: 0.5; cursor: not-allowed; }
+
+button.secondary {
+    background: var(--pb-surface-2);
+    color: var(--pb-text);
+    border: 1px solid var(--pb-border);
+}
+
+button.danger { background: var(--pb-danger); color: #200; }
+
+input[type="text"],
+input[type="email"],
+input[type="password"],
+input[type="number"] {
+    background: var(--pb-surface-2);
+    border: 1px solid var(--pb-border);
+    color: var(--pb-text);
+    border-radius: var(--pb-radius);
+    padding: 0.6rem 0.75rem;
+    width: 100%;
+}
+
+label {
+    display: block;
+    font-size: 0.85rem;
+    color: var(--pb-text-dim);
+    margin: 0.75rem 0 0.3rem;
+}
+
+.card {
+    background: var(--pb-surface);
+    border: 1px solid var(--pb-border);
+    border-radius: var(--pb-radius);
+    padding: 1.25rem;
+}
+
+.hidden { display: none !important; }
+
+.error-text { color: var(--pb-danger); font-size: 0.9rem; margin-top: 0.5rem; }
+.muted { color: var(--pb-text-dim); }

@@ -1,0 +1,24 @@
+{
+    "name": "drhmedia/photobooth",
+    "description": "Self-hosted, portable web photobooth application",
+    "type": "project",
+    "license": "proprietary",
+    "require": {
+        "php": "^8.1",
+        "slim/slim": "^4.14",
+        "slim/psr7": "^1.7",
+        "php-di/php-di": "^7.0",
+        "vlucas/phpdotenv": "^5.6",
+        "chillerlan/php-qrcode": "^5.0",
+        "phpmailer/phpmailer": "^6.9"
+    },
+    "autoload": {
+        "psr-4": {
+            "Photobooth\\": "src/"
+        }
+    },
+    "config": {
+        "sort-packages": true,
+        "optimize-autoloader": true
+    }
+}

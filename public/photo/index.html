@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Your Photo</title>
+<meta name="robots" content="noindex">
+<link rel="stylesheet" href="/assets/css/app.css">
+<style>
+  body { display:flex; align-items:center; justify-content:center; min-height:100vh; padding:1.5rem; }
+  .wrap { max-width: 480px; width: 100%; text-align: center; }
+  img { max-width: 100%; border-radius: 14px; box-shadow: 0 10px 40px rgba(0,0,0,0.5); }
+  .actions { margin-top: 1.25rem; display:flex; gap:0.75rem; justify-content:center; flex-wrap:wrap; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div id="status" class="muted">Loading your photo&hellip;</div>
+  <img id="photo" class="hidden">
+  <div class="actions hidden" id="actions">
+    <a id="download-link" download="photo.jpg"><button>Download</button></a>
+  </div>
+</div>
+<script>
+(async function () {
+  const params = new URLSearchParams(window.location.search);
+  const id = params.get('id');
+  const statusEl = document.getElementById('status');
+  const img = document.getElementById('photo');
+  const actions = document.getElementById('actions');
+
+  if (!id) {
+    statusEl.textContent = 'No photo specified.';
+    return;
+  }
+
+  try {
+    const res = await fetch(`/api/photos/${encodeURIComponent(id)}`);
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || 'Photo not found.');
+
+    document.title = `Photo — ${data.photo.event_name}`;
+    img.src = data.photo.image_url;
+    img.classList.remove('hidden');
+    document.getElementById('download-link').href = data.photo.image_url;
+    actions.classList.remove('hidden');
+    statusEl.classList.add('hidden');
+  } catch (err) {
+    statusEl.textContent = err.message;
+  }
+})();
+</script>
+</body>
+</html>

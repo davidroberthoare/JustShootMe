@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Photobooth</title>
+<meta name="robots" content="noindex">
+<link rel="stylesheet" href="/assets/css/app.css">
+<link rel="stylesheet" href="/assets/css/booth.css">
+</head>
+<body>
+<div class="booth-shell" id="booth-shell">
+
+  <div class="screen active" id="screen-loading">
+    <p class="muted">Loading&hellip;</p>
+  </div>
+
+  <div class="screen" id="screen-error">
+    <p class="error-text" id="error-message">Something went wrong.</p>
+  </div>
+
+  <div class="screen" id="screen-full">
+    <img class="booth-logo hidden" id="full-logo">
+    <p class="full-message">This event is full &mdash; thanks for stopping by! Ask an event host for help.</p>
+  </div>
+
+  <div class="screen" id="screen-start">
+    <img class="booth-logo hidden" id="start-logo">
+    <h1 class="booth-title" id="event-name"></h1>
+    <p class="booth-subtitle">Tap to start</p>
+    <div class="choice-row">
+      <button class="choice-btn" id="choose-single">📷 Single Photo</button>
+      <button class="choice-btn" id="choose-strip">🎞️ Photo Strip</button>
+    </div>
+  </div>
+
+  <div class="screen" id="screen-camera">
+    <div class="camera-wrap">
+      <video id="video" autoplay playsinline muted></video>
+      <div class="countdown-overlay hidden" id="countdown"></div>
+    </div>
+    <p class="muted" id="shot-progress"></p>
+  </div>
+
+  <div class="screen" id="screen-preview">
+    <img class="result-image" id="result-image">
+    <div class="action-row">
+      <button class="secondary" id="retake-btn">Retake</button>
+      <button id="continue-btn">Use this photo</button>
+    </div>
+  </div>
+
+  <div class="screen" id="screen-uploading">
+    <p class="muted">Saving your photo&hellip;</p>
+  </div>
+
+  <div class="screen" id="screen-delivery">
+    <img class="result-image" id="delivery-image">
+    <div class="delivery-options">
+      <div class="card delivery-card">
+        <div>Scan for your photo</div>
+        <img class="qr" id="qr-image" alt="QR code">
+      </div>
+      <div class="card delivery-card">
+        <div>Email it to yourself</div>
+        <form id="email-form">
+          <input type="email" id="email-input" placeholder="you@example.com" required>
+          <div style="margin-top:0.75rem;">
+            <button type="submit">Send</button>
+          </div>
+          <div id="email-status" class="muted" style="margin-top:0.5rem;"></div>
+        </form>
+      </div>
+    </div>
+    <div class="action-row">
+      <button class="secondary" id="print-btn">🖨️ Print</button>
+      <button id="new-session-btn">Start over</button>
+    </div>
+  </div>
+
+</div>
+
+<img id="print-image" style="display:none;">
+
+<script src="/assets/js/booth.js"></script>
+</body>
+</html>

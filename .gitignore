@@ -1,0 +1,12 @@
+/vendor/
+/.env
+/storage/*.sqlite
+/storage/events/*
+/storage/archives/*
+/storage/logos/*
+!/storage/events/.gitkeep
+!/storage/archives/.gitkeep
+!/storage/logos/.gitkeep
+.DS_Store
+*.log
+/node_modules/

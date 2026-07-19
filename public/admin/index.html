@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Photobooth Admin</title>
+<meta name="robots" content="noindex">
+<link rel="stylesheet" href="/assets/css/app.css">
+<link rel="stylesheet" href="/assets/css/admin.css">
+</head>
+<body>
+
+<div id="login-view" class="card hidden">
+  <h1>Photobooth Admin</h1>
+  <form id="login-form">
+    <label for="login-email">Email</label>
+    <input type="email" id="login-email" required autocomplete="username">
+    <label for="login-password">Password</label>
+    <input type="password" id="login-password" required autocomplete="current-password">
+    <div style="margin-top:1.25rem;">
+      <button type="submit">Log in</button>
+    </div>
+    <div id="login-error" class="error-text hidden"></div>
+  </form>
+</div>
+
+<div id="dashboard-view" class="admin-shell hidden">
+  <div class="admin-header">
+    <h1>Photobooth Admin</h1>
+    <div>
+      <span id="admin-email" class="muted"></span>
+      <button class="secondary" id="logout-btn">Log out</button>
+    </div>
+  </div>
+
+  <div id="events-list-view">
+    <div class="card">
+      <h2 style="margin-top:0;">New event</h2>
+      <form id="create-event-form">
+        <label for="event-name">Event name</label>
+        <input type="text" id="event-name" required>
+
+        <label for="event-bg-color">Background colour</label>
+        <input type="text" id="event-bg-color" value="#111111">
+
+        <label for="event-logo">Logo (optional)</label>
+        <input type="file" id="event-logo" accept="image/*">
+
+        <label for="event-photo-cap">Photo cap (0 = unlimited)</label>
+        <input type="number" id="event-photo-cap" min="0" placeholder="default from server config">
+
+        <label for="event-storage-cap">Storage cap, MB (0 = unlimited)</label>
+        <input type="number" id="event-storage-cap" min="0" placeholder="default from server config">
+
+        <div style="margin-top:1.25rem;">
+          <button type="submit">Create event</button>
+        </div>
+        <div id="create-event-error" class="error-text hidden"></div>
+      </form>
+    </div>
+
+    <h2>Events</h2>
+    <div id="event-grid" class="event-grid"></div>
+  </div>
+
+  <div id="event-detail-view" class="hidden">
+    <span class="back-link" id="back-to-events">&larr; All events</span>
+    <div class="card">
+      <h2 id="detail-event-name" style="margin-top:0;"></h2>
+      <div id="detail-booth-url" class="booth-url-box"></div>
+      <div class="progress-row" id="detail-stats"></div>
+      <div class="actions" style="margin-top:1rem;">
+        <a id="detail-download-link"><button class="secondary">Download all photos (.zip)</button></a>
+      </div>
+    </div>
+    <div id="detail-photo-grid" class="photo-grid"></div>
+  </div>
+</div>
+
+<script src="/assets/js/admin.js"></script>
+</body>
+</html>

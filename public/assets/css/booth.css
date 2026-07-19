@@ -1,0 +1,117 @@
+html, body {
+    height: 100%;
+    overflow: hidden;
+}
+
+.booth-shell {
+    height: 100vh;
+    width: 100vw;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 1.5rem;
+    text-align: center;
+    transition: background-color 0.3s ease;
+}
+
+.screen { display: none; width: 100%; max-width: 720px; }
+.screen.active { display: flex; flex-direction: column; align-items: center; }
+
+.booth-logo {
+    max-width: 220px;
+    max-height: 140px;
+    margin-bottom: 1.5rem;
+    object-fit: contain;
+}
+
+.booth-title {
+    font-size: 1.8rem;
+    font-weight: 700;
+    margin: 0 0 0.5rem;
+}
+
+.booth-subtitle { color: var(--pb-text-dim); margin-bottom: 2rem; }
+
+.choice-row {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.choice-btn {
+    padding: 1.5rem 2rem;
+    font-size: 1.1rem;
+    min-width: 220px;
+}
+
+video, canvas.preview-canvas {
+    width: 100%;
+    max-width: 560px;
+    border-radius: 14px;
+    background: #000;
+    transform: scaleX(-1); /* mirror the live preview so it feels like a mirror */
+}
+
+canvas.final-canvas { transform: none; }
+
+.countdown-overlay {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 8rem;
+    font-weight: 800;
+    color: white;
+    text-shadow: 0 0 30px rgba(0,0,0,0.6);
+    pointer-events: none;
+}
+
+.camera-wrap { position: relative; width: 100%; max-width: 560px; }
+
+.result-image {
+    max-width: 100%;
+    max-height: 55vh;
+    border-radius: 14px;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+}
+
+.action-row {
+    display: flex;
+    gap: 0.75rem;
+    margin-top: 1.5rem;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.delivery-options {
+    display: flex;
+    gap: 2rem;
+    flex-wrap: wrap;
+    justify-content: center;
+    margin-top: 1.5rem;
+}
+
+.delivery-card {
+    padding: 1.5rem;
+    min-width: 220px;
+}
+
+.delivery-card img.qr { width: 180px; height: 180px; margin-top: 0.75rem; }
+
+.full-message {
+    font-size: 1.4rem;
+    max-width: 480px;
+}
+
+@media print {
+    body * { visibility: hidden; }
+    #print-image, #print-image * { visibility: visible; }
+    #print-image {
+        position: fixed;
+        inset: 0;
+        width: 100%;
+    }
+}
