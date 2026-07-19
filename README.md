@@ -9,7 +9,7 @@ this README covers what's implemented and how to run it.
 
 - **Backend:** PHP 8.1+, [Slim 4](https://www.slimframework.com/) for routing/middleware, raw PDO for persistence (no ORM).
 - **Database:** SQLite by default (zero-config, single file at `storage/photobooth.sqlite`). Swappable to MySQL/Postgres later by changing the DSN in `src/Support/Database.php` — the schema in `database/schema.sql` avoids SQLite-only syntax where practical.
-- **Frontend:** Plain HTML/JS, no framework or build step. Styling is [Bulma](https://bulma.io/) (CSS-only, no JS, mobile-first/responsive by default) plus [Bootstrap Icons](https://icons.getbootstrap.com/) (MIT-licensed SVG/webfont icon set) — both vendored directly into `public/assets/vendor/` (see below) rather than hand-rolled CSS, so there's no design system to maintain by hand.
+- **Frontend:** Plain HTML/JS, no framework or build step. Styling is [Bulma](https://bulma.io/) (CSS-only, no JS, mobile-first/responsive by default) plus [Phosphor Icons](https://phosphoricons.com/) (MIT-licensed, 1,200+ icon webfont) — both vendored directly into `public/assets/vendor/` (see below) rather than hand-rolled CSS, so there's no design system to maintain by hand.
 - **Email:** Amazon SES via its SMTP interface (through PHPMailer).
 - **Images:** GD (bundled with PHP) for logo/photo re-encoding.
 
@@ -21,7 +21,7 @@ public/            Web root. Static pages (booth/, admin/, photo/) + index.php f
   admin/            Admin dashboard (session-cookie auth)
   photo/            "Your photo" page a QR code links to
   assets/           Shared css/js for the above
-    vendor/           Bulma + Bootstrap Icons, vendored (not npm/CDN — see Styling below)
+    vendor/           Bulma + Phosphor Icons, vendored (not npm/CDN — see Styling below)
     css/              Small app-specific overrides only (see comments in each file)
     js/               admin.js, booth.js — no build step, loaded as plain <script> tags
   media/, archive/  Routed through Slim (src/routes.php), not real directories
@@ -101,15 +101,17 @@ libraries rather than hand-coded CSS:
   All layout, forms, buttons, cards, and colours come from its classes
   (`box`, `card`, `field`/`control`, `button is-primary`, `is-hidden`,
   Bulma's own dark-mode support, etc.).
-- **[Bootstrap Icons](https://icons.getbootstrap.com/)**
-  (`public/assets/vendor/bootstrap-icons/`) — an open-source (MIT) icon set.
-  We deliberately do *not* ship the full 2000-icon webfont (~300KB): instead,
-  `sprite.svg` contains only the ~19 icons the app actually uses (~7KB),
-  extracted from the official package. Icons are referenced as
-  `<svg class="bi"><use href="/assets/vendor/bootstrap-icons/sprite.svg#camera-fill"/></svg>`
-  and inherit the surrounding text colour. To add an icon, copy its SVG
-  markup from icons.getbootstrap.com into a new `<symbol>` in `sprite.svg`
-  (instructions in the comment at the top of that file).
+- **[Phosphor Icons](https://phosphoricons.com/)**
+  (`public/assets/vendor/phosphor/regular/`) — an open-source (MIT), actively
+  maintained icon family with 1,200+ icons across several weights (we ship
+  only the "regular" weight, ~150KB). Because it's the full webfont rather
+  than a hand-picked subset, using a new icon anywhere in the app is just
+  `<i class="ph ph-whatever-name"></i>` — no build step, no sprite file to
+  edit. Browse available names at phosphoricons.com. Icons inherit the
+  surrounding text colour. Other weights (`bold`, `fill`, `duotone`, etc.)
+  can be added later the same way: drop the weight's folder from the
+  [phosphor-icons/web](https://github.com/phosphor-icons/web) package
+  alongside `regular/` and link its `style.css`.
 
 Both are vendored directly into the repo (not pulled from a CDN or via npm)
 so the booth still works if an event's wifi is flaky and the app doesn't
