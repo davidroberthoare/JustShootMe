@@ -7,7 +7,7 @@
 <title>Photobooth</title>
 <meta name="robots" content="noindex">
 <link rel="stylesheet" href="/assets/vendor/bulma/bulma.min.css">
-<link rel="stylesheet" href="/assets/vendor/bootstrap-icons/bootstrap-icons.min.css">
+<link rel="stylesheet" href="/assets/vendor/bootstrap-icons/icons.css">
 <link rel="stylesheet" href="/assets/css/booth.css">
 </head>
 <body>
@@ -39,11 +39,11 @@
     <p class="subtitle">Tap to start</p>
     <div class="buttons">
       <button class="button is-primary is-large" id="choose-single">
-        <span class="icon"><i class="bi bi-camera-fill"></i></span>
+        <span class="icon"><svg class="bi"><use href="/assets/vendor/bootstrap-icons/sprite.svg#camera-fill"/></svg></span>
         <span>Single Photo</span>
       </button>
       <button class="button is-primary is-large" id="choose-strip">
-        <span class="icon"><i class="bi bi-images"></i></span>
+        <span class="icon"><svg class="bi"><use href="/assets/vendor/bootstrap-icons/sprite.svg#images"/></svg></span>
         <span>Photo Strip</span>
       </button>
     </div>
@@ -63,11 +63,11 @@
     <img class="result-image" id="result-image">
     <div class="buttons mt-4">
       <button class="button" id="retake-btn">
-        <span class="icon"><i class="bi bi-arrow-counterclockwise"></i></span>
+        <span class="icon"><svg class="bi"><use href="/assets/vendor/bootstrap-icons/sprite.svg#arrow-counterclockwise"/></svg></span>
         <span>Retake</span>
       </button>
       <button class="button is-primary" id="continue-btn">
-        <span class="icon"><i class="bi bi-check-lg"></i></span>
+        <span class="icon"><svg class="bi"><use href="/assets/vendor/bootstrap-icons/sprite.svg#check-lg"/></svg></span>
         <span>Use this photo</span>
       </button>
     </div>
@@ -83,13 +83,13 @@
     <div class="columns is-mobile is-centered is-multiline">
       <div class="column is-narrow">
         <div class="box delivery-card has-text-centered">
-          <p><i class="bi bi-qr-code mr-1"></i> Scan for your photo</p>
+          <p><svg class="bi mr-1"><use href="/assets/vendor/bootstrap-icons/sprite.svg#qr-code"/></svg> Scan for your photo</p>
           <img class="qr-code mt-2" id="qr-image" alt="QR code linking to your photo">
         </div>
       </div>
       <div class="column is-narrow">
         <div class="box delivery-card has-text-centered">
-          <p><i class="bi bi-envelope mr-1"></i> Email it to yourself</p>
+          <p><svg class="bi mr-1"><use href="/assets/vendor/bootstrap-icons/sprite.svg#envelope"/></svg> Email it to yourself</p>
           <form id="email-form" class="mt-2">
             <div class="field has-addons">
               <div class="control">
@@ -97,7 +97,7 @@
               </div>
               <div class="control">
                 <button type="submit" class="button is-link">
-                  <span class="icon"><i class="bi bi-send"></i></span>
+                  <span class="icon"><svg class="bi"><use href="/assets/vendor/bootstrap-icons/sprite.svg#send"/></svg></span>
                 </button>
               </div>
             </div>
@@ -108,11 +108,11 @@
     </div>
     <div class="buttons mt-4">
       <button class="button" id="print-btn">
-        <span class="icon"><i class="bi bi-printer"></i></span>
+        <span class="icon"><svg class="bi"><use href="/assets/vendor/bootstrap-icons/sprite.svg#printer"/></svg></span>
         <span>Print</span>
       </button>
       <button class="button is-primary" id="new-session-btn">
-        <span class="icon"><i class="bi bi-arrow-repeat"></i></span>
+        <span class="icon"><svg class="bi"><use href="/assets/vendor/bootstrap-icons/sprite.svg#arrow-repeat"/></svg></span>
         <span>Start over</span>
       </button>
     </div>

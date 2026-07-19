@@ -99,7 +99,7 @@
             </div>
             <div class="control">
               <button class="button is-small copy-btn" title="Copy booth URL">
-                <span class="icon"><i class="bi bi-clipboard"></i></span>
+                <span class="icon"><svg class="bi"><use href="/assets/vendor/bootstrap-icons/sprite.svg#clipboard"/></svg></span>
               </button>
             </div>
           </div>
@@ -107,7 +107,7 @@
         </div>
         <footer class="card-footer">
           <a class="card-footer-item view-gallery-btn">
-            <span class="icon"><i class="bi bi-images"></i></span>&nbsp;Gallery
+            <span class="icon"><svg class="bi"><use href="/assets/vendor/bootstrap-icons/sprite.svg#images"/></svg></span>&nbsp;Gallery
           </a>
         </footer>
       </div>

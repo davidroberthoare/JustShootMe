@@ -102,14 +102,20 @@ libraries rather than hand-coded CSS:
   (`box`, `card`, `field`/`control`, `button is-primary`, `is-hidden`,
   Bulma's own dark-mode support, etc.).
 - **[Bootstrap Icons](https://icons.getbootstrap.com/)**
-  (`public/assets/vendor/bootstrap-icons/`) — an open-source (MIT), webfont-
-  based icon set. Icons are just `<i class="bi bi-camera-fill"></i>` tags.
+  (`public/assets/vendor/bootstrap-icons/`) — an open-source (MIT) icon set.
+  We deliberately do *not* ship the full 2000-icon webfont (~300KB): instead,
+  `sprite.svg` contains only the ~19 icons the app actually uses (~7KB),
+  extracted from the official package. Icons are referenced as
+  `<svg class="bi"><use href="/assets/vendor/bootstrap-icons/sprite.svg#camera-fill"/></svg>`
+  and inherit the surrounding text colour. To add an icon, copy its SVG
+  markup from icons.getbootstrap.com into a new `<symbol>` in `sprite.svg`
+  (instructions in the comment at the top of that file).
 
 Both are vendored directly into the repo (not pulled from a CDN or via npm)
 so the booth still works if an event's wifi is flaky and the app doesn't
-need a JS build step. To upgrade either library, download a newer release
-and replace the files under `public/assets/vendor/{bulma,bootstrap-icons}/`
-— see the `LICENSE` file alongside each for attribution terms.
+need a JS build step. To upgrade Bulma, download a newer release and replace
+`public/assets/vendor/bulma/bulma.min.css` — see the `LICENSE` file
+alongside each library for attribution terms.
 
 The only custom CSS in the app is `public/assets/css/admin.css` and
 `booth.css`, and both are deliberately small: they hold *only* the handful
