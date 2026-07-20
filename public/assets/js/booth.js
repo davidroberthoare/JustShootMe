@@ -201,6 +201,45 @@
     return canvas;
   }
 
+  /** Briefly flashes the camera view white, like a real camera flash, timed to the moment of capture. */
+  function flashCamera() {
+    return new Promise((resolve) => {
+      const el = $('flash-overlay');
+      let settled = false;
+      const done = () => {
+        if (settled) return;
+        settled = true;
+        el.classList.remove('is-flashing');
+        el.removeEventListener('animationend', done);
+        clearTimeout(fallback);
+        resolve();
+      };
+      el.classList.remove('is-flashing');
+      void el.offsetWidth; // force reflow so back-to-back flashes (each strip shot) restart the animation
+      el.classList.add('is-flashing');
+      el.addEventListener('animationend', done);
+      // A timeout fallback, not just 'animationend': prefers-reduced-motion
+      // (see booth.css) sets animation: none on .is-flashing, so the
+      // animation — and therefore 'animationend' — never fires at all.
+      const fallback = setTimeout(done, 350);
+    });
+  }
+
+  /**
+   * Shows `canvas` (a grabFrame() result — already mirrored/correctly
+   * oriented) as a still image over the live video, so the guest gets
+   * clear "that shot's taken" feedback during a multi-shot strip.
+   */
+  function showFreezeFrame(canvas) {
+    const freeze = $('freeze-frame');
+    freeze.src = canvas.toDataURL('image/jpeg', 0.85);
+    freeze.classList.remove('is-hidden');
+  }
+
+  function hideFreezeFrame() {
+    $('freeze-frame').classList.add('is-hidden');
+  }
+
   /** Footer height in px for a canvas of the given width — see FOOTER_HEIGHT_RATIO. */
   function footerHeightFor(canvasWidth) {
     return Math.round(canvasWidth * FOOTER_HEIGHT_RATIO);
@@ -295,6 +334,7 @@
   /** Runs camera -> countdown(s) -> capture(s) -> composite, then shows the preview screen. */
   async function runCaptureFlow(type) {
     showScreen('screen-camera');
+    hideFreezeFrame(); // clean slate — a retake or a previous session may have left this showing
     await startCamera(); // resolves once real stream dimensions are known, not a guessed delay
     // Let the camera auto-exposure/focus settle for a beat before the first countdown.
     await new Promise((r) => setTimeout(r, 400));
@@ -306,8 +346,20 @@
       $('shot-progress').textContent = shotCount > 1 ? `Shot ${i + 1} of ${shotCount}` : '';
       $('shot-progress').classList.toggle('is-hidden', shotCount <= 1);
       await countdown(3);
-      frames.push(grabFrame());
-      if (i < shotCount - 1) await new Promise((r) => setTimeout(r, 600));
+
+      const frame = grabFrame();
+      frames.push(frame);
+      await flashCamera();
+
+      const isLastShot = i === shotCount - 1;
+      if (!isLastShot) {
+        // Hold on the still just taken so the guest gets clear "got it"
+        // feedback before the next countdown starts. Not needed on the
+        // final shot — the composited result appears straight after.
+        showFreezeFrame(frame);
+        await new Promise((r) => setTimeout(r, 1000));
+        hideFreezeFrame();
+      }
     }
 
     stopCamera();

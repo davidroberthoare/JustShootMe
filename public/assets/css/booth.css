@@ -130,18 +130,21 @@ html, body {
     background: #000;
 }
 
-/* Big countdown number ("3… 2… 1…") layered on top of the live video. */
+/* Big countdown number ("3… 2… 1…") layered on top of the live video.
+   Sized off the viewport's shorter side (vmin) rather than a fixed rem so
+   it stays large and proportionate on everything from a phone to an iPad. */
 .countdown-overlay {
     position: absolute;
     inset: 0;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 7rem;
+    font-size: clamp(8rem, 34vmin, 18rem);
     font-weight: 800;
     color: white;
     text-shadow: 0 0 30px rgba(0, 0, 0, 0.6);
     pointer-events: none;
+    z-index: 2;
 }
 
 .shot-progress-badge {
@@ -152,9 +155,55 @@ html, body {
     margin: 0;
     background: rgba(0, 0, 0, 0.45);
     color: #fff;
-    padding: 0.35rem 0.9rem;
+    padding: 0.55rem 1.25rem;
     border-radius: 999px;
-    font-size: 0.85rem;
+    font-size: 1.35rem;
+    font-weight: 600;
+    z-index: 2;
+}
+
+/* Freeze-frame: shows the still just captured, held briefly over the live
+   video between strip shots (see runCaptureFlow in booth.js) so the guest
+   gets clear "that one's taken" feedback before the next countdown. It's
+   booth.js's own already-mirrored capture (see grabFrame), so — unlike
+   #video — it does NOT get the CSS mirror transform. */
+#freeze-frame {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    z-index: 1;
+}
+
+/* Camera-flash effect, triggered by booth.js adding .is-flashing at the
+   moment of capture. A plain white layer animated via opacity rather than
+   toggling display, so it composites cleanly over whatever's beneath
+   (live video or the freeze-frame). */
+.flash-overlay {
+    position: absolute;
+    inset: 0;
+    background: #fff;
+    opacity: 0;
+    pointer-events: none;
+    z-index: 3;
+}
+
+.flash-overlay.is-flashing {
+    animation: camera-flash 350ms ease-out;
+}
+
+@keyframes camera-flash {
+    0% { opacity: 0; }
+    12% { opacity: 0.92; }
+    100% { opacity: 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .flash-overlay.is-flashing {
+        /* Skip the flash rather than an instant, motion-triggering blink. */
+        animation: none;
+    }
 }
 
 /* Slim, semi-transparent bar over the bottom of the camera/preview screens —
