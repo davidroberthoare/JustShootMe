@@ -199,8 +199,6 @@
 
     $('detail-name').value = event.name;
     $('detail-bg-color').value = event.background_color;
-    $('detail-photo-cap').value = event.photo_cap || '';
-    $('detail-storage-cap').value = event.storage_cap_bytes ? Math.round(event.storage_cap_bytes / (1024 * 1024)) : '';
 
     $('detail-logo').value = '';
     $('detail-logo-name').textContent = 'No file selected';
@@ -263,8 +261,6 @@
     const form = new FormData();
     form.set('name', $('detail-name').value);
     form.set('background_color', $('detail-bg-color').value);
-    if ($('detail-photo-cap').value) form.set('photo_cap', $('detail-photo-cap').value);
-    if ($('detail-storage-cap').value) form.set('storage_cap_mb', $('detail-storage-cap').value);
     if ($('detail-logo').files[0]) form.set('logo', $('detail-logo').files[0]);
 
     try {

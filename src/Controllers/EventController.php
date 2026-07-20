@@ -53,7 +53,11 @@ final class EventController extends BaseController
         return $this->json($response, ['event' => $this->present($event)]);
     }
 
-    /** POST /api/admin/events (multipart/form-data: name, background_color, photo_cap?, storage_cap_mb?, logo?) */
+    /**
+     * POST /api/admin/events (multipart/form-data: name, background_color, logo?)
+     * Photo/storage caps are installation-wide (DEFAULT_EVENT_PHOTO_CAP /
+     * DEFAULT_EVENT_STORAGE_CAP_MB), not per-event — admins can't override them.
+     */
     public function create(Request $request, Response $response): Response
     {
         // Spec decision: when the server-wide storage cap is reached, block
@@ -78,13 +82,8 @@ final class EventController extends BaseController
             return $this->error($response, 'background_color must be a hex value like #112233.', 422);
         }
 
-        $photoCap = isset($body['photo_cap']) && $body['photo_cap'] !== ''
-            ? max(0, (int) $body['photo_cap'])
-            : $this->config['limits']['default_event_photo_cap'];
-
-        $storageCapBytes = isset($body['storage_cap_mb']) && $body['storage_cap_mb'] !== ''
-            ? max(0, (int) $body['storage_cap_mb']) * 1024 * 1024
-            : $this->config['limits']['default_event_storage_cap_bytes'];
+        $photoCap = $this->config['limits']['default_event_photo_cap'];
+        $storageCapBytes = $this->config['limits']['default_event_storage_cap_bytes'];
 
         $uuid = Uuid::v4();
         $boothCode = $this->generateUniqueBoothCode();
@@ -138,14 +137,6 @@ final class EventController extends BaseController
             return $this->error($response, 'background_color must be a hex value like #112233.', 422);
         }
 
-        $photoCap = isset($body['photo_cap']) && $body['photo_cap'] !== ''
-            ? max(0, (int) $body['photo_cap'])
-            : $this->config['limits']['default_event_photo_cap'];
-
-        $storageCapBytes = isset($body['storage_cap_mb']) && $body['storage_cap_mb'] !== ''
-            ? max(0, (int) $body['storage_cap_mb']) * 1024 * 1024
-            : $this->config['limits']['default_event_storage_cap_bytes'];
-
         $logoPath = $event['logo_path'];
         $newLogoPath = $this->handleLogoUpload($request);
         if ($newLogoPath !== null) {
@@ -159,10 +150,10 @@ final class EventController extends BaseController
 
         $stmt = $this->pdo->prepare(
             'UPDATE events
-             SET name = ?, background_color = ?, logo_path = ?, photo_cap = ?, storage_cap_bytes = ?
+             SET name = ?, background_color = ?, logo_path = ?
              WHERE id = ?'
         );
-        $stmt->execute([$name, $backgroundColor, $logoPath, $photoCap, $storageCapBytes, $event['id']]);
+        $stmt->execute([$name, $backgroundColor, $logoPath, $event['id']]);
 
         $updated = $this->findOwnedEvent((int) $event['id']);
 
