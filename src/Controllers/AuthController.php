@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Photobooth\Controllers;
+namespace JustShootMe\Controllers;
 
 use PDO;
 use Psr\Http\Message\ResponseInterface as Response;

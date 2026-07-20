@@ -3,7 +3,7 @@
 declare(strict_types=1);
 
 use DI\Container;
-use Photobooth\Controllers\{
+use JustShootMe\Controllers\{
     ArchiveController,
     AuthController,
     EventController,
@@ -11,9 +11,9 @@ use Photobooth\Controllers\{
     MediaController,
     PhotoController
 };
-use Photobooth\Middleware\AdminAuthMiddleware;
-use Photobooth\Services\{ImageService, MailService, QrCodeService, SignedUrlService, StorageService};
-use Photobooth\Support\{Config, Database};
+use JustShootMe\Middleware\AdminAuthMiddleware;
+use JustShootMe\Services\{ImageService, MailService, QrCodeService, SignedUrlService, StorageService};
+use JustShootMe\Support\{Config, Database};
 use Slim\App;
 use Slim\Factory\AppFactory;
 

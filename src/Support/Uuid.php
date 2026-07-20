@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Photobooth\Support;
+namespace JustShootMe\Support;
 
 /** Id generation: proper UUIDv4s for internal record ids (events, photos), plus a short human-typeable code for booth URLs. */
 final class Uuid
