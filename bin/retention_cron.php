@@ -14,11 +14,11 @@ declare(strict_types=1);
  *                         whichever comes first, per spec).
  *
  * Intended to run once a day via cron, e.g.:
- *   0 3 * * * php /path/to/photobooth/bin/retention_cron.php >> /var/log/photobooth-retention.log 2>&1
+ *   0 3 * * * php /path/to/justshootme/bin/retention_cron.php >> /var/log/justshootme-retention.log 2>&1
  */
 
-use Photobooth\Services\{MailService, SignedUrlService, StorageService};
-use Photobooth\Support\{Config, Database};
+use JustShootMe\Services\{MailService, SignedUrlService, StorageService};
+use JustShootMe\Support\{Config, Database};
 
 require_once __DIR__ . '/../vendor/autoload.php';
 

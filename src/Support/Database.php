@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Photobooth\Support;
+namespace JustShootMe\Support;
 
 use PDO;
 

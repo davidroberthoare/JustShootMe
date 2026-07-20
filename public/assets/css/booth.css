@@ -107,7 +107,7 @@ html, body {
 }
 
 /* Live camera preview fills its frame completely (crops, doesn't letterbox)
-   and is mirrored like a real mirror/photobooth. The captured frame itself
+   and is mirrored like a real mirror/justshootme. The captured frame itself
    is un-mirrored in booth.js so the final photo reads correctly (e.g. text
    in the background isn't backwards). */
 #video {

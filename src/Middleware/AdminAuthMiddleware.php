@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Photobooth\Middleware;
+namespace JustShootMe\Middleware;
 
 use Psr\Http\Message\ResponseFactoryInterface;
 use Psr\Http\Message\ResponseInterface as Response;

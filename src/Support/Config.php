@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Photobooth\Support;
+namespace JustShootMe\Support;
 
 /**
  * Thin typed wrapper around environment variables loaded by phpdotenv.
@@ -39,7 +39,7 @@ final class Config
                 'secret' => $str('APP_SECRET', ''),
             ],
             'db' => [
-                'path' => $rootPath . '/' . ltrim($str('DB_PATH', 'storage/photobooth.sqlite'), '/'),
+                'path' => $rootPath . '/' . ltrim($str('DB_PATH', 'storage/justshootme.sqlite'), '/'),
             ],
             'storage' => [
                 'events_path' => $rootPath . '/' . ltrim($str('STORAGE_EVENTS_PATH', 'storage/events'), '/'),
@@ -52,7 +52,7 @@ final class Config
                 'username' => $str('SES_SMTP_USERNAME'),
                 'password' => $str('SES_SMTP_PASSWORD'),
                 'from_email' => $str('SES_FROM_EMAIL'),
-                'from_name' => $str('SES_FROM_NAME', 'Photobooth'),
+                'from_name' => $str('SES_FROM_NAME', 'JustShootMe'),
             ],
             'retention' => [
                 'active_days' => $int('RETENTION_ACTIVE_DAYS', 7),

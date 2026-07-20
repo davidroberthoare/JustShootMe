@@ -1,4 +1,4 @@
--- Photobooth database schema (SQLite)
+-- JustShootMe database schema (SQLite)
 -- Swappable to MySQL/Postgres later; kept to portable ANSI-ish SQL where practical.
 
 CREATE TABLE IF NOT EXISTS admins (

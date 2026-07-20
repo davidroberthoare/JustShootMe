@@ -7,7 +7,7 @@ declare(strict_types=1);
  * Creates (or updates the password of) an admin account.
  */
 
-use Photobooth\Support\{Config, Database};
+use JustShootMe\Support\{Config, Database};
 
 require_once __DIR__ . '/../vendor/autoload.php';
 

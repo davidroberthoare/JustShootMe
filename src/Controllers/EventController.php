@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace Photobooth\Controllers;
+namespace JustShootMe\Controllers;
 
 use PDO;
-use Photobooth\Services\{ImageService, StorageService};
-use Photobooth\Support\Uuid;
+use JustShootMe\Services\{ImageService, StorageService};
+use JustShootMe\Support\Uuid;
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
 

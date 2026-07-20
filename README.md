@@ -1,4 +1,4 @@
-# Photobooth
+# JustShootMe
 
 A portable, self-hosted photobooth web app. Guests capture photos in the
 browser (no native app), get them via QR code or email, and admins manage
@@ -8,7 +8,7 @@ this README covers what's implemented and how to run it.
 ## Stack
 
 - **Backend:** PHP 8.1+, [Slim 4](https://www.slimframework.com/) for routing/middleware, raw PDO for persistence (no ORM).
-- **Database:** SQLite by default (zero-config, single file at `storage/photobooth.sqlite`). Swappable to MySQL/Postgres later by changing the DSN in `src/Support/Database.php` — the schema in `database/schema.sql` avoids SQLite-only syntax where practical.
+- **Database:** SQLite by default (zero-config, single file at `storage/justshootme.sqlite`). Swappable to MySQL/Postgres later by changing the DSN in `src/Support/Database.php` — the schema in `database/schema.sql` avoids SQLite-only syntax where practical.
 - **Frontend:** Plain HTML/JS, no framework or build step. Styling is [Bulma](https://bulma.io/) (CSS-only, no JS, mobile-first/responsive by default) plus [Phosphor Icons](https://phosphoricons.com/) (MIT-licensed, 1,200+ icon webfont) — both vendored directly into `public/assets/vendor/` (see below) rather than hand-rolled CSS, so there's no design system to maintain by hand.
 - **Email:** Amazon SES via its SMTP interface (through PHPMailer).
 - **Images:** GD (bundled with PHP) for logo/photo re-encoding.
@@ -155,7 +155,7 @@ set at runtime in JS (`booth.js`, `admin.js`) instead of being a CSS rule.
 Implemented in `bin/retention_cron.php`, intended to run daily via cron:
 
 ```cron
-0 3 * * * php /path/to/photobooth/bin/retention_cron.php >> /var/log/photobooth-retention.log 2>&1
+0 3 * * * php /path/to/justshootme/bin/retention_cron.php >> /var/log/justshootme-retention.log 2>&1
 ```
 
 1. **Active** (day 0–7, configurable via `RETENTION_ACTIVE_DAYS`): event is

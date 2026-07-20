@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Photobooth\Services;
+namespace JustShootMe\Services;
 
 use RuntimeException;
 use ZipArchive;

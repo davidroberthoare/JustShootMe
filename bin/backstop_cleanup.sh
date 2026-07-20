@@ -10,7 +10,7 @@
 # EVENTS_MAX_AGE_DAYS (well past the app's 7-day active window).
 #
 # Suggested crontab (run after the app-level sweep):
-#   30 3 * * * /path/to/photobooth/bin/backstop_cleanup.sh >> /var/log/photobooth-backstop.log 2>&1
+#   30 3 * * * /path/to/justshootme/bin/backstop_cleanup.sh >> /var/log/justshootme-backstop.log 2>&1
 
 set -euo pipefail
 

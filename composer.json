@@ -1,6 +1,6 @@
 {
-    "name": "drhmedia/photobooth",
-    "description": "Self-hosted, portable web photobooth application",
+    "name": "drhmedia/justshootme",
+    "description": "Self-hosted, portable web photo booth application (JustShootMe)",
     "type": "project",
     "license": "proprietary",
     "require": {
@@ -14,7 +14,7 @@
     },
     "autoload": {
         "psr-4": {
-            "Photobooth\\": "src/"
+            "JustShootMe\\": "src/"
         }
     },
     "config": {

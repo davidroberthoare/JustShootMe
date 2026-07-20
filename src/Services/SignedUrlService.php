@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Photobooth\Services;
+namespace JustShootMe\Services;
 
 /**
  * HMAC-signed, expiring URLs for archive downloads (spec: "signed/expiring

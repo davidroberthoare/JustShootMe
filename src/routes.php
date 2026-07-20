@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-use Photobooth\Controllers\{
+use JustShootMe\Controllers\{
     ArchiveController,
     AuthController,
     EventController,
@@ -10,7 +10,7 @@ use Photobooth\Controllers\{
     MediaController,
     PhotoController
 };
-use Photobooth\Middleware\AdminAuthMiddleware;
+use JustShootMe\Middleware\AdminAuthMiddleware;
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
 use Slim\App;
