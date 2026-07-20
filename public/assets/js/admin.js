@@ -7,8 +7,15 @@
  * sending that cookie automatically (same-origin), so there's no token to
  * manage client-side.
  *
+ * The event detail view is a single form used for both creating and editing
+ * an event (see openNewEventForm / openEventDetail / populateDetailView) —
+ * "New event" drops straight into it in create mode, and clicking a card's
+ * "Manage" opens the same form pre-filled in edit mode, with Delete
+ * available. `editingEventId` (null in create mode) is what the shared
+ * submit handler uses to decide POST /events vs POST /events/{id}.
+ *
  * All visual styling comes from Bulma classes in the HTML (is-hidden,
- * is-active, card, notification, etc.) plus Bootstrap Icons; this file only
+ * is-active, card, notification, etc.) plus Phosphor icons; this file only
  * toggles those classes and fills in text/attributes — it does not set
  * inline styles except for the one genuinely dynamic value (an event's
  * admin-chosen background colour swatch).
@@ -47,12 +54,13 @@
     dashboardView.classList.remove('is-hidden');
     $('admin-email').textContent = email || '';
     showEventsList();
-    loadEvents();
   }
 
+  /** Also reloads the grid — covers arriving here after a create/edit/delete in the detail view. */
   function showEventsList() {
     eventsListView.classList.remove('is-hidden');
     eventDetailView.classList.add('is-hidden');
+    loadEvents();
   }
 
   function showEventDetail() {
@@ -75,6 +83,39 @@
     return div.innerHTML;
   }
 
+  /** Builds a clickable "Link to Live Photo Booth" row + copy button, used on each event card. */
+  function boothLinkBlock(url) {
+    const wrap = document.createElement('div');
+    wrap.className = 'field';
+
+    const label = document.createElement('label');
+    label.className = 'label is-size-7 mb-1';
+    label.textContent = 'Link to Live Photo Booth';
+    wrap.appendChild(label);
+
+    const row = document.createElement('div');
+    row.className = 'is-flex is-align-items-center booth-link-row';
+
+    const a = document.createElement('a');
+    a.href = url;
+    a.target = '_blank';
+    a.rel = 'noopener';
+    a.className = 'booth-link';
+    a.textContent = url;
+    row.appendChild(a);
+
+    const copyBtn = document.createElement('button');
+    copyBtn.type = 'button';
+    copyBtn.className = 'button is-small copy-btn';
+    copyBtn.title = 'Copy booth URL';
+    copyBtn.innerHTML = '<span class="icon is-small"><i class="ph ph-clipboard"></i></span>';
+    copyBtn.addEventListener('click', () => navigator.clipboard.writeText(url));
+    row.appendChild(copyBtn);
+
+    wrap.appendChild(row);
+    return wrap;
+  }
+
   /** Builds one Bulma <div class="card"> for the events grid. */
   function eventCard(ev) {
     const col = document.createElement('div');
@@ -93,30 +134,19 @@
           <p class="title is-5 mt-2">
             <span class="color-swatch" style="background-color:${ev.background_color}"></span>${escapeHtml(ev.name)}
           </p>
-          <div class="field has-addons">
-            <div class="control is-expanded">
-              <input class="input is-small" type="text" readonly value="${ev.booth_url}">
-            </div>
-            <div class="control">
-              <button class="button is-small copy-btn" title="Copy booth URL">
-                <span class="icon"><i class="ph ph-clipboard"></i></span>
-              </button>
-            </div>
-          </div>
-          <p class="is-size-7 has-text-grey">${cap} &middot; ${storageCap}</p>
+          <div class="booth-link-slot"></div>
+          <p class="is-size-7 has-text-grey mt-2">${cap} &middot; ${storageCap}</p>
         </div>
         <footer class="card-footer">
-          <a class="card-footer-item view-gallery-btn">
-            <span class="icon"><i class="ph ph-images"></i></span>&nbsp;Gallery
+          <a class="card-footer-item manage-btn">
+            <span class="icon"><i class="ph ph-pencil-simple"></i></span>&nbsp;Manage
           </a>
         </footer>
       </div>
     `;
 
-    col.querySelector('.copy-btn').addEventListener('click', () => {
-      navigator.clipboard.writeText(ev.booth_url);
-    });
-    col.querySelector('.view-gallery-btn').addEventListener('click', () => openEventDetail(ev.id));
+    col.querySelector('.booth-link-slot').appendChild(boothLinkBlock(ev.booth_url));
+    col.querySelector('.manage-btn').addEventListener('click', () => openEventDetail(ev.id));
 
     return col;
   }
@@ -126,29 +156,72 @@
     const grid = $('event-grid');
     grid.innerHTML = '';
     if (events.length === 0) {
-      grid.innerHTML = '<p class="has-text-grey">No events yet — create one above.</p>';
+      grid.innerHTML = '<p class="has-text-grey">No events yet — create one.</p>';
       return;
     }
     events.forEach((ev) => grid.appendChild(eventCard(ev)));
   }
 
-  async function openEventDetail(id) {
-    const { event } = await api(`/api/admin/events/${id}`);
-    const { photos } = await api(`/api/admin/events/${id}/photos`);
+  // -------------------- Event detail: shared create/edit form --------------------
 
-    $('detail-event-name').textContent = event.name;
-    $('detail-booth-url').innerHTML = `
-      <div class="control is-expanded">
-        <input class="input" type="text" readonly value="${event.booth_url}">
-      </div>
-    `;
+  let editingEventId = null; // null while creating a not-yet-saved event; an id once it exists
+
+  function resetDetailForm() {
+    $('event-form').reset();
+    $('detail-bg-color').value = '#111111';
+    $('detail-logo').value = '';
+    $('detail-logo-name').textContent = 'No file selected';
+    $('detail-logo-cta').textContent = 'Choose a logo…';
+    $('detail-logo-preview-wrap').classList.add('is-hidden');
+    $('detail-logo-preview').src = '';
+    $('detail-form-error').classList.add('is-hidden');
+    $('detail-form-success').classList.add('is-hidden');
+  }
+
+  function openNewEventForm() {
+    editingEventId = null;
+    resetDetailForm();
+    $('detail-heading').textContent = 'New event';
+    $('detail-save-label').textContent = 'Create event';
+    $('detail-delete-wrap').classList.add('is-hidden');
+    $('detail-live-info').classList.add('is-hidden');
+    $('detail-photo-grid').innerHTML = '';
+    showEventDetail();
+  }
+
+  /** Fills the form + the "existing event" sections (booth link, stats, gallery) from a saved event. */
+  function populateDetailView(event, photos) {
+    editingEventId = event.id;
+
+    $('detail-heading').textContent = event.name;
+    $('detail-save-label').textContent = 'Save changes';
+    $('detail-delete-wrap').classList.remove('is-hidden');
+
+    $('detail-name').value = event.name;
+    $('detail-bg-color').value = event.background_color;
+    $('detail-photo-cap').value = event.photo_cap || '';
+    $('detail-storage-cap').value = event.storage_cap_bytes ? Math.round(event.storage_cap_bytes / (1024 * 1024)) : '';
+
+    $('detail-logo').value = '';
+    $('detail-logo-name').textContent = 'No file selected';
+    $('detail-logo-cta').textContent = event.logo_url ? 'Replace logo…' : 'Choose a logo…';
+    if (event.logo_url) {
+      $('detail-logo-preview').src = event.logo_url;
+      $('detail-logo-preview-wrap').classList.remove('is-hidden');
+    } else {
+      $('detail-logo-preview-wrap').classList.add('is-hidden');
+    }
+
+    $('detail-booth-link').href = event.booth_url;
+    $('detail-booth-link').textContent = event.booth_url;
     $('detail-stats').textContent =
       `${event.photo_count} photos captured · ${fmtBytes(event.storage_used_bytes)} used · created ${event.created_at}`;
-    $('detail-download-link').setAttribute('href', `/api/admin/events/${id}/download`);
+    $('detail-download-link').setAttribute('href', `/api/admin/events/${event.id}/download`);
+    $('detail-live-info').classList.remove('is-hidden');
 
     const grid = $('detail-photo-grid');
     grid.innerHTML = '';
-    photos.forEach((p) => {
+    (photos || []).forEach((p) => {
       const a = document.createElement('a');
       a.href = p.view_url;
       a.target = '_blank';
@@ -159,10 +232,70 @@
       grid.appendChild(a);
     });
 
+    $('detail-form-error').classList.add('is-hidden');
+  }
+
+  async function openEventDetail(id) {
+    const { event } = await api(`/api/admin/events/${id}`);
+    const { photos } = await api(`/api/admin/events/${id}/photos`);
+    populateDetailView(event, photos);
     showEventDetail();
   }
 
+  $('new-event-btn').addEventListener('click', openNewEventForm);
   $('back-to-events').addEventListener('click', showEventsList);
+
+  $('detail-copy-btn').addEventListener('click', () => {
+    navigator.clipboard.writeText($('detail-booth-link').href);
+  });
+
+  $('detail-logo').addEventListener('change', (e) => {
+    const name = e.target.files[0] ? e.target.files[0].name : 'No file selected';
+    $('detail-logo-name').textContent = name;
+  });
+
+  $('event-form').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    $('detail-form-error').classList.add('is-hidden');
+    $('detail-form-success').classList.add('is-hidden');
+
+    // multipart/form-data, not JSON, because this request may include a logo file.
+    const form = new FormData();
+    form.set('name', $('detail-name').value);
+    form.set('background_color', $('detail-bg-color').value);
+    if ($('detail-photo-cap').value) form.set('photo_cap', $('detail-photo-cap').value);
+    if ($('detail-storage-cap').value) form.set('storage_cap_mb', $('detail-storage-cap').value);
+    if ($('detail-logo').files[0]) form.set('logo', $('detail-logo').files[0]);
+
+    try {
+      if (editingEventId === null) {
+        const { event } = await api('/api/admin/events', { method: 'POST', body: form });
+        populateDetailView(event, []);
+      } else {
+        const { event } = await api(`/api/admin/events/${editingEventId}`, { method: 'POST', body: form });
+        const { photos } = await api(`/api/admin/events/${editingEventId}/photos`);
+        populateDetailView(event, photos);
+        $('detail-form-success').classList.remove('is-hidden');
+      }
+    } catch (err) {
+      $('detail-form-error').textContent = err.message;
+      $('detail-form-error').classList.remove('is-hidden');
+    }
+  });
+
+  $('detail-delete-btn').addEventListener('click', async () => {
+    if (editingEventId === null) return;
+    if (!confirm('Delete this event and all its photos? This cannot be undone.')) return;
+    try {
+      await api(`/api/admin/events/${editingEventId}`, { method: 'DELETE' });
+      showEventsList();
+    } catch (err) {
+      $('detail-form-error').textContent = err.message;
+      $('detail-form-error').classList.remove('is-hidden');
+    }
+  });
+
+  // -------------------- Login/logout --------------------
 
   $('login-form').addEventListener('submit', async (e) => {
     e.preventDefault();
@@ -185,36 +318,6 @@
   $('logout-btn').addEventListener('click', async () => {
     await api('/api/admin/logout', { method: 'POST' });
     showLogin();
-  });
-
-  // Bulma's file input doesn't update its own filename label automatically.
-  $('event-logo').addEventListener('change', (e) => {
-    const name = e.target.files[0] ? e.target.files[0].name : 'No file selected';
-    $('event-logo-name').textContent = name;
-  });
-
-  $('create-event-form').addEventListener('submit', async (e) => {
-    e.preventDefault();
-    $('create-event-error').classList.add('is-hidden');
-
-    // multipart/form-data, not JSON, because this request may include a logo file.
-    const form = new FormData();
-    form.set('name', $('event-name').value);
-    form.set('background_color', $('event-bg-color').value);
-    if ($('event-photo-cap').value) form.set('photo_cap', $('event-photo-cap').value);
-    if ($('event-storage-cap').value) form.set('storage_cap_mb', $('event-storage-cap').value);
-    if ($('event-logo').files[0]) form.set('logo', $('event-logo').files[0]);
-
-    try {
-      await api('/api/admin/events', { method: 'POST', body: form });
-      e.target.reset();
-      $('event-bg-color').value = '#111111';
-      $('event-logo-name').textContent = 'No file selected';
-      loadEvents();
-    } catch (err) {
-      $('create-event-error').textContent = err.message;
-      $('create-event-error').classList.remove('is-hidden');
-    }
   });
 
   // On load: ask the server if we already have a valid session (GET /api/admin/me)

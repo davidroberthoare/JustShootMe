@@ -39,7 +39,24 @@
     border: 1px solid rgba(0, 0, 0, 0.2);
 }
 
-/* The booth URL is shown read-only next to a copy button (Bulma "field has-addons"). */
-#detail-booth-url .input {
+/* Booth link: a real, clickable <a> (not a readonly input) next to a small
+   copy button — used both on event cards and the event detail view. */
+.booth-link-row {
+    gap: 0.5rem;
+}
+
+.booth-link {
     font-size: 0.85rem;
+    word-break: break-all;
+}
+
+.card .booth-link {
+    flex: 1;
+    min-width: 0;
+}
+
+#detail-logo-preview {
+    max-height: 48px;
+    max-width: 140px;
+    object-fit: contain;
 }

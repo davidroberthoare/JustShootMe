@@ -11,9 +11,14 @@ use ZipArchive;
  * Owns the on-disk layout for event photos, logos, and archives, plus the
  * per-event / global cap checks called out in the spec's Data Retention section.
  *
- *   storage/logos/{event_uuid}.{ext}
+ *   storage/logos/{logo_id}.{ext}
  *   storage/events/{event_uuid}/{photo_uuid}.jpg
  *   storage/archives/{event_uuid}.zip
+ *
+ * Logos are keyed by their own fresh id (not the event's uuid) so that
+ * replacing an event's logo always produces a brand-new URL — otherwise a
+ * browser or CDN caching the old /media/logos/{event_uuid}.png response
+ * could keep serving the stale image after an admin uploads a new one.
  */
 final class StorageService
 {
@@ -39,12 +44,21 @@ final class StorageService
         return $this->eventPhotosDir($eventUuid) . '/' . $photoUuid . '.' . ltrim($extension, '.');
     }
 
-    public function logoPath(string $eventUuid, string $extension): string
+    public function logoPath(string $logoId, string $extension): string
     {
         if (!is_dir($this->logosPath)) {
             mkdir($this->logosPath, 0775, true);
         }
-        return $this->logosPath . '/' . $eventUuid . '.' . ltrim($extension, '.');
+        return $this->logosPath . '/' . $logoId . '.' . ltrim($extension, '.');
+    }
+
+    /** Deletes a logo file by its stored filename (the events.logo_path value, e.g. "{logoId}.png"). */
+    public function deleteLogoFile(string $filename): void
+    {
+        $path = $this->logosPath . '/' . basename($filename);
+        if (is_file($path)) {
+            @unlink($path);
+        }
     }
 
     public function archivePath(string $eventUuid): string

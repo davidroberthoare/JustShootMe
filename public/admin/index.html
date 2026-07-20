@@ -75,69 +75,13 @@
   <div class="container py-5 px-4">
 
     <div id="events-list-view">
-      <div class="box">
-        <h2 class="title is-5"><i class="ph ph-plus-circle mr-2"></i>New event</h2>
-        <form id="create-event-form">
-          <div class="columns is-multiline">
-            <div class="column is-6">
-              <div class="field">
-                <label class="label" for="event-name">Event name</label>
-                <div class="control">
-                  <input class="input" type="text" id="event-name" required>
-                </div>
-              </div>
-            </div>
-            <div class="column is-6">
-              <div class="field">
-                <label class="label" for="event-bg-color">Background colour</label>
-                <div class="control">
-                  <input class="input" type="color" id="event-bg-color" value="#111111">
-                </div>
-              </div>
-            </div>
-            <div class="column is-6">
-              <div class="field">
-                <label class="label" for="event-logo">Logo (optional)</label>
-                <div class="file has-name is-fullwidth">
-                  <label class="file-label">
-                    <input class="file-input" type="file" id="event-logo" accept="image/*">
-                    <span class="file-cta">
-                      <span class="file-icon"><i class="ph ph-image"></i></span>
-                      <span class="file-label">Choose a logo&hellip;</span>
-                    </span>
-                    <span class="file-name" id="event-logo-name">No file selected</span>
-                  </label>
-                </div>
-              </div>
-            </div>
-            <div class="column is-3">
-              <div class="field">
-                <label class="label" for="event-photo-cap">Photo cap</label>
-                <div class="control">
-                  <input class="input" type="number" id="event-photo-cap" min="0" placeholder="server default">
-                </div>
-              </div>
-            </div>
-            <div class="column is-3">
-              <div class="field">
-                <label class="label" for="event-storage-cap">Storage cap (MB)</label>
-                <div class="control">
-                  <input class="input" type="number" id="event-storage-cap" min="0" placeholder="server default">
-                </div>
-              </div>
-            </div>
-          </div>
-          <div class="field mt-3">
-            <button type="submit" class="button is-primary">
-              <span class="icon"><i class="ph ph-check-circle"></i></span>
-              <span>Create event</span>
-            </button>
-          </div>
-          <p id="create-event-error" class="help is-danger is-hidden"></p>
-        </form>
+      <div class="is-flex is-justify-content-space-between is-align-items-center mb-4">
+        <h2 class="title is-5 mb-0"><i class="ph ph-calendar mr-2"></i>Events</h2>
+        <button class="button is-primary" id="new-event-btn">
+          <span class="icon"><i class="ph ph-plus-circle"></i></span>
+          <span>New event</span>
+        </button>
       </div>
-
-      <h2 class="title is-5 mt-5"><i class="ph ph-calendar mr-2"></i>Events</h2>
       <div id="event-grid" class="columns is-multiline"></div>
     </div>
 
@@ -145,10 +89,92 @@
       <a class="is-flex is-align-items-center mb-4" id="back-to-events">
         <i class="ph ph-arrow-left mr-2"></i> All events
       </a>
+
       <div class="box">
-        <h2 class="title is-5" id="detail-event-name"></h2>
-        <div class="field has-addons" id="detail-booth-url"></div>
-        <p class="is-size-7 has-text-grey" id="detail-stats"></p>
+        <h2 class="title is-5" id="detail-heading">New event</h2>
+        <form id="event-form">
+          <div class="columns is-multiline">
+            <div class="column is-6">
+              <div class="field">
+                <label class="label" for="detail-name">Event name</label>
+                <div class="control">
+                  <input class="input" type="text" id="detail-name" required>
+                </div>
+              </div>
+            </div>
+            <div class="column is-6">
+              <div class="field">
+                <label class="label" for="detail-bg-color">Background colour</label>
+                <div class="control">
+                  <input class="input" type="color" id="detail-bg-color" value="#111111">
+                </div>
+              </div>
+            </div>
+            <div class="column is-6">
+              <div class="field">
+                <label class="label" for="detail-logo">Logo</label>
+                <div class="is-flex is-align-items-center mb-2 is-hidden" id="detail-logo-preview-wrap">
+                  <img id="detail-logo-preview" alt="Current logo" class="mr-2">
+                  <span class="is-size-7 has-text-grey">Current logo</span>
+                </div>
+                <div class="file has-name is-fullwidth">
+                  <label class="file-label">
+                    <input class="file-input" type="file" id="detail-logo" accept="image/*">
+                    <span class="file-cta">
+                      <span class="file-icon"><i class="ph ph-image"></i></span>
+                      <span class="file-label" id="detail-logo-cta">Choose a logo&hellip;</span>
+                    </span>
+                    <span class="file-name" id="detail-logo-name">No file selected</span>
+                  </label>
+                </div>
+              </div>
+            </div>
+            <div class="column is-3">
+              <div class="field">
+                <label class="label" for="detail-photo-cap">Photo cap</label>
+                <div class="control">
+                  <input class="input" type="number" id="detail-photo-cap" min="0" placeholder="server default">
+                </div>
+              </div>
+            </div>
+            <div class="column is-3">
+              <div class="field">
+                <label class="label" for="detail-storage-cap">Storage cap (MB)</label>
+                <div class="control">
+                  <input class="input" type="number" id="detail-storage-cap" min="0" placeholder="server default">
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="field is-grouped mt-3">
+            <div class="control">
+              <button type="submit" class="button is-primary" id="detail-save-btn">
+                <span class="icon"><i class="ph ph-check-circle"></i></span>
+                <span id="detail-save-label">Create event</span>
+              </button>
+            </div>
+            <div class="control is-hidden" id="detail-delete-wrap">
+              <button type="button" class="button is-danger is-light" id="detail-delete-btn">
+                <span class="icon"><i class="ph ph-trash"></i></span>
+                <span>Delete event</span>
+              </button>
+            </div>
+          </div>
+          <p id="detail-form-error" class="help is-danger is-hidden"></p>
+          <p id="detail-form-success" class="help is-success is-hidden">Saved.</p>
+        </form>
+      </div>
+
+      <div class="box is-hidden" id="detail-live-info">
+        <label class="label is-size-7">Link to Live Photo Booth</label>
+        <div class="is-flex is-align-items-center booth-link-row">
+          <a id="detail-booth-link" target="_blank" rel="noopener" class="booth-link"></a>
+          <button class="button is-small copy-btn" type="button" id="detail-copy-btn" title="Copy booth URL">
+            <span class="icon is-small"><i class="ph ph-clipboard"></i></span>
+          </button>
+        </div>
+        <p class="is-size-7 has-text-grey mt-3" id="detail-stats"></p>
         <div class="field mt-4">
           <a id="detail-download-link">
             <button class="button">
@@ -158,6 +184,7 @@
           </a>
         </div>
       </div>
+
       <div id="detail-photo-grid" class="photo-grid"></div>
     </div>
 

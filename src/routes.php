@@ -32,6 +32,10 @@ $app->group('/api/admin', function ($group) {
     $group->get('/events', [EventController::class, 'index']);
     $group->post('/events', [EventController::class, 'create']);
     $group->get('/events/{id}', [EventController::class, 'show']);
+    // POST, not PATCH: PHP doesn't populate $_FILES/parsed-body for
+    // multipart PATCH requests, and this update may include a logo file.
+    $group->post('/events/{id}', [EventController::class, 'update']);
+    $group->delete('/events/{id}', [EventController::class, 'destroy']);
     $group->get('/events/{id}/photos', [GalleryController::class, 'index']);
     $group->get('/events/{id}/download', [GalleryController::class, 'download']);
 })->add(AdminAuthMiddleware::class);
