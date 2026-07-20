@@ -6,7 +6,7 @@
 <title>Photobooth Admin</title>
 <meta name="robots" content="noindex">
 <link rel="stylesheet" href="/assets/vendor/bulma/bulma.min.css">
-<link rel="stylesheet" href="/assets/vendor/bootstrap-icons/icons.css">
+<link rel="stylesheet" href="/assets/vendor/phosphor/regular/style.css">
 <link rel="stylesheet" href="/assets/css/admin.css">
 </head>
 <body>
@@ -18,26 +18,26 @@
         <div class="column is-4">
           <div class="box">
             <h1 class="title is-4 has-text-centered">
-              <svg class="bi mr-2"><use href="/assets/vendor/bootstrap-icons/sprite.svg#camera-fill"/></svg> Photobooth Admin
+              <i class="ph ph-camera mr-2"></i> Photobooth Admin
             </h1>
             <form id="login-form">
               <div class="field">
                 <label class="label" for="login-email">Email</label>
                 <div class="control has-icons-left">
                   <input class="input" type="email" id="login-email" required autocomplete="username">
-                  <span class="icon is-small is-left"><svg class="bi"><use href="/assets/vendor/bootstrap-icons/sprite.svg#envelope"/></svg></span>
+                  <span class="icon is-small is-left"><i class="ph ph-envelope"></i></span>
                 </div>
               </div>
               <div class="field">
                 <label class="label" for="login-password">Password</label>
                 <div class="control has-icons-left">
                   <input class="input" type="password" id="login-password" required autocomplete="current-password">
-                  <span class="icon is-small is-left"><svg class="bi"><use href="/assets/vendor/bootstrap-icons/sprite.svg#lock"/></svg></span>
+                  <span class="icon is-small is-left"><i class="ph ph-lock"></i></span>
                 </div>
               </div>
               <div class="field mt-5">
                 <button type="submit" class="button is-link is-fullwidth">
-                  <span class="icon"><svg class="bi"><use href="/assets/vendor/bootstrap-icons/sprite.svg#box-arrow-in-right"/></svg></span>
+                  <span class="icon"><i class="ph ph-sign-in"></i></span>
                   <span>Log in</span>
                 </button>
               </div>
@@ -55,7 +55,7 @@
     <div class="container">
       <div class="navbar-brand">
         <span class="navbar-item">
-          <svg class="bi mr-2"><use href="/assets/vendor/bootstrap-icons/sprite.svg#camera-fill"/></svg> <strong>Photobooth Admin</strong>
+          <i class="ph ph-camera mr-2"></i> <strong>Photobooth Admin</strong>
         </span>
       </div>
       <div class="navbar-menu">
@@ -63,7 +63,7 @@
           <span class="navbar-item" id="admin-email"></span>
           <div class="navbar-item">
             <button class="button is-link is-inverted" id="logout-btn">
-              <span class="icon"><svg class="bi"><use href="/assets/vendor/bootstrap-icons/sprite.svg#box-arrow-right"/></svg></span>
+              <span class="icon"><i class="ph ph-sign-out"></i></span>
               <span>Log out</span>
             </button>
           </div>
@@ -76,7 +76,7 @@
 
     <div id="events-list-view">
       <div class="box">
-        <h2 class="title is-5"><svg class="bi mr-2"><use href="/assets/vendor/bootstrap-icons/sprite.svg#plus-circle"/></svg>New event</h2>
+        <h2 class="title is-5"><i class="ph ph-plus-circle mr-2"></i>New event</h2>
         <form id="create-event-form">
           <div class="columns is-multiline">
             <div class="column is-6">
@@ -102,7 +102,7 @@
                   <label class="file-label">
                     <input class="file-input" type="file" id="event-logo" accept="image/*">
                     <span class="file-cta">
-                      <span class="file-icon"><svg class="bi"><use href="/assets/vendor/bootstrap-icons/sprite.svg#image"/></svg></span>
+                      <span class="file-icon"><i class="ph ph-image"></i></span>
                       <span class="file-label">Choose a logo&hellip;</span>
                     </span>
                     <span class="file-name" id="event-logo-name">No file selected</span>
@@ -129,7 +129,7 @@
           </div>
           <div class="field mt-3">
             <button type="submit" class="button is-primary">
-              <span class="icon"><svg class="bi"><use href="/assets/vendor/bootstrap-icons/sprite.svg#check-circle"/></svg></span>
+              <span class="icon"><i class="ph ph-check-circle"></i></span>
               <span>Create event</span>
             </button>
           </div>
@@ -137,13 +137,13 @@
         </form>
       </div>
 
-      <h2 class="title is-5 mt-5"><svg class="bi mr-2"><use href="/assets/vendor/bootstrap-icons/sprite.svg#calendar-event"/></svg>Events</h2>
+      <h2 class="title is-5 mt-5"><i class="ph ph-calendar mr-2"></i>Events</h2>
       <div id="event-grid" class="columns is-multiline"></div>
     </div>
 
     <div id="event-detail-view" class="is-hidden">
       <a class="is-flex is-align-items-center mb-4" id="back-to-events">
-        <svg class="bi mr-2"><use href="/assets/vendor/bootstrap-icons/sprite.svg#arrow-left"/></svg> All events
+        <i class="ph ph-arrow-left mr-2"></i> All events
       </a>
       <div class="box">
         <h2 class="title is-5" id="detail-event-name"></h2>
@@ -152,7 +152,7 @@
         <div class="field mt-4">
           <a id="detail-download-link">
             <button class="button">
-              <span class="icon"><svg class="bi"><use href="/assets/vendor/bootstrap-icons/sprite.svg#download"/></svg></span>
+              <span class="icon"><i class="ph ph-download-simple"></i></span>
               <span>Download all photos (.zip)</span>
             </button>
           </a>

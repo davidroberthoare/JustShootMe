@@ -7,7 +7,7 @@
 <title>Photobooth</title>
 <meta name="robots" content="noindex">
 <link rel="stylesheet" href="/assets/vendor/bulma/bulma.min.css">
-<link rel="stylesheet" href="/assets/vendor/bootstrap-icons/icons.css">
+<link rel="stylesheet" href="/assets/vendor/phosphor/regular/style.css">
 <link rel="stylesheet" href="/assets/css/booth.css">
 </head>
 <body>
@@ -18,103 +18,112 @@
 -->
 <div class="booth-shell" id="booth-shell">
 
-  <div class="screen is-active" id="screen-loading">
-    <p class="has-text-grey-light">Loading&hellip;</p>
+  <div class="screen screen--centered is-active" id="screen-loading">
+    <p class="screen-status-text">Loading&hellip;</p>
   </div>
 
-  <div class="screen" id="screen-error">
+  <div class="screen screen--centered" id="screen-error">
     <p class="notification is-danger" id="error-message">Something went wrong.</p>
   </div>
 
-  <div class="screen" id="screen-full">
+  <div class="screen screen--centered" id="screen-full">
     <img class="booth-logo is-hidden" id="full-logo">
     <p class="title is-4">This event is full &mdash; thanks for stopping by!</p>
     <p class="subtitle is-6">Ask an event host for help.</p>
   </div>
 
   <!-- Step 1: welcome screen, guest picks single photo or multi-shot strip. -->
-  <div class="screen" id="screen-start">
+  <div class="screen screen--centered" id="screen-start">
     <img class="booth-logo is-hidden" id="start-logo">
     <h1 class="title is-2" id="event-name"></h1>
     <p class="subtitle">Tap to start</p>
     <div class="buttons">
       <button class="button is-primary is-large" id="choose-single">
-        <span class="icon"><svg class="bi"><use href="/assets/vendor/bootstrap-icons/sprite.svg#camera-fill"/></svg></span>
+        <span class="icon"><i class="ph ph-camera"></i></span>
         <span>Single Photo</span>
       </button>
       <button class="button is-primary is-large" id="choose-strip">
-        <span class="icon"><svg class="bi"><use href="/assets/vendor/bootstrap-icons/sprite.svg#images"/></svg></span>
+        <span class="icon"><i class="ph ph-images"></i></span>
         <span>Photo Strip</span>
       </button>
     </div>
   </div>
 
-  <!-- Step 2: live camera + countdown, one or more shots depending on choice. -->
+  <!-- Step 2: live camera + countdown, one or more shots depending on choice.
+       The camera fills the entire frame (object-fit: cover in booth.css);
+       booth.js reads this frame's actual on-screen box to compute crops,
+       so what's captured always matches what the guest saw. -->
   <div class="screen" id="screen-camera">
-    <div class="camera-wrap">
+    <div class="media-frame" id="camera-wrap">
       <video id="video" autoplay playsinline muted></video>
       <div class="countdown-overlay is-hidden" id="countdown"></div>
+      <p class="shot-progress-badge is-hidden" id="shot-progress"></p>
     </div>
-    <p class="has-text-grey-light mt-3" id="shot-progress"></p>
   </div>
 
   <!-- Step 3: review the branded composite, retake or continue. -->
   <div class="screen" id="screen-preview">
-    <img class="result-image" id="result-image">
-    <div class="buttons mt-4">
+    <div class="media-frame">
+      <img id="result-image" alt="Your captured photo">
+    </div>
+    <div class="controls-bar">
       <button class="button" id="retake-btn">
-        <span class="icon"><svg class="bi"><use href="/assets/vendor/bootstrap-icons/sprite.svg#arrow-counterclockwise"/></svg></span>
+        <span class="icon"><i class="ph ph-arrow-counter-clockwise"></i></span>
         <span>Retake</span>
       </button>
       <button class="button is-primary" id="continue-btn">
-        <span class="icon"><svg class="bi"><use href="/assets/vendor/bootstrap-icons/sprite.svg#check-lg"/></svg></span>
+        <span class="icon"><i class="ph ph-check-fat"></i></span>
         <span>Use this photo</span>
       </button>
     </div>
   </div>
 
-  <div class="screen" id="screen-uploading">
-    <p class="has-text-grey-light">Saving your photo&hellip;</p>
+  <div class="screen screen--centered" id="screen-uploading">
+    <p class="screen-status-text">Saving your photo&hellip;</p>
   </div>
 
   <!-- Step 4: delivery — QR code, email, print. No native OS share sheet (spec). -->
   <div class="screen" id="screen-delivery">
-    <img class="result-image mb-4" id="delivery-image">
-    <div class="columns is-mobile is-centered is-multiline">
-      <div class="column is-narrow">
-        <div class="box delivery-card has-text-centered">
-          <p><svg class="bi mr-1"><use href="/assets/vendor/bootstrap-icons/sprite.svg#qr-code"/></svg> Scan for your photo</p>
-          <img class="qr-code mt-2" id="qr-image" alt="QR code linking to your photo">
-        </div>
-      </div>
-      <div class="column is-narrow">
-        <div class="box delivery-card has-text-centered">
-          <p><svg class="bi mr-1"><use href="/assets/vendor/bootstrap-icons/sprite.svg#envelope"/></svg> Email it to yourself</p>
-          <form id="email-form" class="mt-2">
-            <div class="field has-addons">
-              <div class="control">
-                <input class="input" type="email" id="email-input" placeholder="you@example.com" required>
-              </div>
-              <div class="control">
-                <button type="submit" class="button is-link">
-                  <span class="icon"><svg class="bi"><use href="/assets/vendor/bootstrap-icons/sprite.svg#send"/></svg></span>
-                </button>
-              </div>
-            </div>
-            <p class="help" id="email-status"></p>
-          </form>
-        </div>
-      </div>
+    <div class="media-frame">
+      <img id="delivery-image" alt="Your photo">
     </div>
-    <div class="buttons mt-4">
-      <button class="button" id="print-btn">
-        <span class="icon"><svg class="bi"><use href="/assets/vendor/bootstrap-icons/sprite.svg#printer"/></svg></span>
-        <span>Print</span>
-      </button>
-      <button class="button is-primary" id="new-session-btn">
-        <span class="icon"><svg class="bi"><use href="/assets/vendor/bootstrap-icons/sprite.svg#arrow-repeat"/></svg></span>
-        <span>Start over</span>
-      </button>
+    <div class="delivery-panel">
+      <div class="columns is-mobile is-centered is-multiline mb-0">
+        <div class="column is-narrow">
+          <div class="box delivery-card has-text-centered">
+            <p><i class="ph ph-qr-code mr-1"></i> Scan for your photo</p>
+            <img class="qr-code mt-2" id="qr-image" alt="QR code linking to your photo">
+          </div>
+        </div>
+        <div class="column is-narrow">
+          <div class="box delivery-card has-text-centered">
+            <p><i class="ph ph-envelope mr-1"></i> Email it to yourself</p>
+            <form id="email-form" class="mt-2">
+              <div class="field has-addons">
+                <div class="control">
+                  <input class="input" type="email" id="email-input" placeholder="you@example.com" required>
+                </div>
+                <div class="control">
+                  <button type="submit" class="button is-link">
+                    <span class="icon"><i class="ph ph-paper-plane-tilt"></i></span>
+                  </button>
+                </div>
+              </div>
+              <p class="help" id="email-status"></p>
+            </form>
+          </div>
+        </div>
+      </div>
+      <div class="buttons is-centered mt-3 mb-0">
+        <button class="button" id="print-btn">
+          <span class="icon"><i class="ph ph-printer"></i></span>
+          <span>Print</span>
+        </button>
+        <button class="button is-primary" id="new-session-btn">
+          <span class="icon"><i class="ph ph-arrow-clockwise"></i></span>
+          <span>Start over</span>
+        </button>
+      </div>
     </div>
   </div>
 
