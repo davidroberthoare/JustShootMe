@@ -94,7 +94,7 @@
       }
 
       $('event-name').textContent = event.name;
-      showScreen('screen-start');
+      goToStart();
     } catch (err) {
       showError(err.message);
     }
@@ -127,27 +127,50 @@
     });
   }
 
+  /** Every <video> that should mirror whatever the current camera `stream` is — the on-screen capture video, plus the start screen's decorative preview. */
+  function cameraVideoEls() {
+    return [$('video'), $('start-preview-video')].filter(Boolean);
+  }
+
+  let cameraStartPromise = null; // in-flight getUserMedia() call, if any — see startCamera
+
   async function startCamera() {
-    // Ask for the camera's best available resolution and let it pick
-    // whatever native aspect ratio it wants (most webcams/phone cameras
-    // are landscape-shaped by hardware, and that's fine) — compositeSingle()
-    // crops to the on-screen box itself, so there's no need to fight the
-    // camera into a specific shape here. An earlier version requested an
-    // `aspectRatio` ideal matching the page's portrait layout; on hardware
-    // that can't natively produce that shape, this can make the browser
-    // fall back to a lower-quality internal mode to approximate it, which
-    // is the likely cause of noticeably softer captures than the live
-    // preview. Asking only for resolution avoids that.
-    stream = await navigator.mediaDevices.getUserMedia({
-      video: {
-        facingMode: 'user',
-        width: { ideal: 1920 },
-        height: { ideal: 1920 },
-      },
-      audio: false,
-    });
+    // Reuse an already-open (or already-in-flight) stream rather than
+    // requesting a fresh one — the common case is the start screen's preview
+    // (see startPreviewCamera) already opened it, so jumping into a capture
+    // shouldn't re-prompt for permission, cause a visible camera restart, or
+    // — if a guest taps a mode button before the preview's own request has
+    // resolved yet — fire off a second concurrent getUserMedia() call.
+    if (!stream) {
+      if (!cameraStartPromise) {
+        // Ask for the camera's best available resolution and let it pick
+        // whatever native aspect ratio it wants (most webcams/phone cameras
+        // are landscape-shaped by hardware, and that's fine) — compositeSingle()
+        // crops to the on-screen box itself, so there's no need to fight the
+        // camera into a specific shape here. An earlier version requested an
+        // `aspectRatio` ideal matching the page's portrait layout; on hardware
+        // that can't natively produce that shape, this can make the browser
+        // fall back to a lower-quality internal mode to approximate it, which
+        // is the likely cause of noticeably softer captures than the live
+        // preview. Asking only for resolution avoids that.
+        cameraStartPromise = navigator.mediaDevices
+          .getUserMedia({
+            video: {
+              facingMode: 'user',
+              width: { ideal: 1920 },
+              height: { ideal: 1920 },
+            },
+            audio: false,
+          })
+          .then((s) => {
+            stream = s;
+            cameraVideoEls().forEach((el) => { el.srcObject = stream; });
+          })
+          .finally(() => { cameraStartPromise = null; });
+      }
+      await cameraStartPromise;
+    }
     const video = $('video');
-    video.srcObject = stream;
     // Wait for real dimensions rather than guessing a settle time — videoWidth
     // is 0 until the browser has actually negotiated the stream's shape.
     await new Promise((resolve) => {
@@ -156,11 +179,32 @@
     });
   }
 
+  /** Best-effort live preview behind the start screen — decorative only, so any failure (permission denied, no camera) is swallowed and just leaves the plain background colour. */
+  async function startPreviewCamera() {
+    try {
+      await startCamera();
+    } catch (err) {
+      // Nothing to show for it — the actual capture flow will surface a
+      // real error itself if the guest goes on to tap a capture button.
+    }
+  }
+
+  /** Shows the welcome screen and (re)starts its background camera preview — the single entry point back to screen-start so the preview never gets forgotten on one path but not another. */
+  function goToStart() {
+    if (event && event.is_full) {
+      showScreen('screen-full');
+      return;
+    }
+    showScreen('screen-start');
+    startPreviewCamera();
+  }
+
   /** Always call this once capture is done — an idle open camera drains battery/keeps the light on. */
   function stopCamera() {
     if (stream) {
       stream.getTracks().forEach((t) => t.stop());
       stream = null;
+      cameraVideoEls().forEach((el) => { el.srcObject = null; });
     }
   }
 
@@ -422,12 +466,12 @@
     lastPhotoUuid = null;
     lastResultDataUrl = null;
     stopCamera();
-    showScreen(event && event.is_full ? 'screen-full' : 'screen-start');
+    goToStart();
   }
 
   $('choose-single').addEventListener('click', () => runCaptureFlow('single'));
   $('choose-strip').addEventListener('click', () => runCaptureFlow('strip'));
-  $('retake-btn').addEventListener('click', () => showScreen('screen-start'));
+  $('retake-btn').addEventListener('click', goToStart);
   $('new-session-btn').addEventListener('click', resetToStart);
 
   // No native OS share sheet (spec) — printing goes through the browser's own

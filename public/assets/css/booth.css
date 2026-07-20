@@ -57,6 +57,36 @@ html, body {
     max-width: 480px;
 }
 
+/* Live camera preview behind the start screen's logo/title/buttons — washed
+   out (opacity) so it reads as ambience rather than competing with the
+   content or the event's background colour showing through it. */
+#screen-start {
+    position: relative;
+    overflow: hidden;
+}
+
+.start-preview-video {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    max-width: none; /* overrides the generic ".screen--centered > *" cap above */
+    object-fit: cover;
+    transform: scaleX(-1);
+    opacity: 0.5;
+}
+
+/* Wraps the actual start-screen content so it paints above the preview
+   video (a plain in-flow sibling would still stack fine, but this keeps the
+   "content above background" relationship explicit and easy to extend). */
+.start-content {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
 /* The booth stage's background is an arbitrary colour the admin picked at
    event setup (booth.js sets it inline on .booth-shell and toggles
    .is-light-bg based on that colour's brightness) — it can be light or

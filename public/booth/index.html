@@ -41,20 +41,26 @@
     <p class="subtitle is-6">Ask an event host for help.</p>
   </div>
 
-  <!-- Step 1: welcome screen, guest picks single photo or multi-shot strip. -->
+  <!-- Step 1: welcome screen, guest picks single photo or multi-shot strip.
+       start-preview-video is a live, washed-out camera feed behind the
+       content — purely decorative, not what gets captured (that's the
+       full-strength #video on screen-camera once a mode is picked). -->
   <div class="screen screen--centered" id="screen-start">
-    <img class="booth-logo is-hidden" id="start-logo">
-    <h1 class="title is-2" id="event-name"></h1>
-    <p class="subtitle">Tap to start</p>
-    <div class="buttons">
-      <button class="button is-primary is-large" id="choose-single">
-        <span class="icon"><i class="ph ph-camera"></i></span>
-        <span>Single Photo</span>
-      </button>
-      <button class="button is-primary is-large" id="choose-strip">
-        <span class="icon"><i class="ph ph-images"></i></span>
-        <span>Photo Strip</span>
-      </button>
+    <video class="start-preview-video" id="start-preview-video" autoplay playsinline muted></video>
+    <div class="start-content">
+      <img class="booth-logo is-hidden" id="start-logo">
+      <h1 class="title is-2" id="event-name"></h1>
+      <p class="subtitle">Tap to start</p>
+      <div class="buttons">
+        <button class="button is-primary is-large" id="choose-single">
+          <span class="icon"><i class="ph ph-camera"></i></span>
+          <span>Single Photo</span>
+        </button>
+        <button class="button is-primary is-large" id="choose-strip">
+          <span class="icon"><i class="ph ph-images"></i></span>
+          <span>Photo Strip</span>
+        </button>
+      </div>
     </div>
   </div>
 
