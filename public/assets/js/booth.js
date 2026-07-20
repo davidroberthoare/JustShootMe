@@ -43,15 +43,6 @@
   // scales sensibly across the range of output sizes above.
   const FOOTER_HEIGHT_RATIO = 0.148;
 
-  // iOS Safari has a well-known quirk where a getUserMedia frame is
-  // occasionally delivered rotated 90° from how the live <video> is
-  // actually displayed — most likely mid-session (e.g. partway through a
-  // 3-shot strip). grabFrame() detects this by comparing the frame's own
-  // orientation to the on-screen preview box's orientation, and corrects
-  // it. If a "fixed" shot ever comes out sideways in the OTHER direction,
-  // flip this one flag — nothing else needs to change.
-  const ROTATE_LANDSCAPE_FRAMES_CLOCKWISE = true;
-
   let event = null; // { uuid, name, logo_url, background_color, is_full } — from /booth/config/{code}
   let logoImage = null; // preloaded <img> for the event logo, reused across captures
   let stream = null; // active getUserMedia MediaStream, or null when the camera is off
@@ -127,16 +118,21 @@
   }
 
   async function startCamera() {
-    // Ask for a stream shaped like this device's actual screen (portrait on
-    // a phone, landscape on a laptop webcam) rather than a guessed fixed
-    // aspect — reduces how much cropping compositeSingle() has to do later.
-    const idealAspect = window.innerWidth / window.innerHeight;
+    // Ask for the camera's best available resolution and let it pick
+    // whatever native aspect ratio it wants (most webcams/phone cameras
+    // are landscape-shaped by hardware, and that's fine) — compositeSingle()
+    // crops to the on-screen box itself, so there's no need to fight the
+    // camera into a specific shape here. An earlier version requested an
+    // `aspectRatio` ideal matching the page's portrait layout; on hardware
+    // that can't natively produce that shape, this can make the browser
+    // fall back to a lower-quality internal mode to approximate it, which
+    // is the likely cause of noticeably softer captures than the live
+    // preview. Asking only for resolution avoids that.
     stream = await navigator.mediaDevices.getUserMedia({
       video: {
         facingMode: 'user',
-        aspectRatio: { ideal: idealAspect },
-        width: { ideal: 1080 },
-        height: { ideal: 1440 },
+        width: { ideal: 1920 },
+        height: { ideal: 1920 },
       },
       audio: false,
     });
@@ -178,46 +174,31 @@
     });
   }
 
-  /** True if `el`'s on-screen box is taller than it is wide. */
-  function isPortraitBox(el) {
-    const box = el.getBoundingClientRect();
-    return box.height >= box.width;
-  }
-
   /**
-   * Grabs one still frame from the live <video> element, correcting for the
-   * iOS Safari rotation quirk described above ROTATE_LANDSCAPE_FRAMES_CLOCKWISE.
-   * We detect it by comparing this frame's own shape (landscape vs portrait)
-   * to the shape of the on-screen preview box the guest was actually looking
-   * at — a mismatch means this particular frame came back rotated 90°.
+   * Grabs one still frame from the live <video> element into a same-size
+   * canvas. Deliberately does NOT try to detect/correct "rotation" — a
+   * landscape-shaped videoWidth/videoHeight (e.g. a typical 1280x720
+   * webcam, or a phone's front camera sensor) is completely normal and
+   * does not mean the frame is oriented wrong; compositeSingle()'s
+   * cover-crop already handles any source shape correctly. An earlier
+   * version of this function tried to "fix" landscape-shaped frames by
+   * rotating them whenever the preview box was portrait-shaped, which
+   * seemed reasonable but was wrong: it fired on any ordinary landscape
+   * camera and mangled otherwise-correct photos. Don't reintroduce that.
    */
   function grabFrame() {
     const video = $('video');
-    const raw = document.createElement('canvas');
-    raw.width = video.videoWidth;
-    raw.height = video.videoHeight;
-    const rawCtx = raw.getContext('2d');
+    const canvas = document.createElement('canvas');
+    canvas.width = video.videoWidth;
+    canvas.height = video.videoHeight;
+    const ctx = canvas.getContext('2d');
     // The live preview is mirrored via CSS (booth.css #video), so mirror
     // the capture too — otherwise the saved photo looks "backwards"
     // compared to what the guest saw on screen.
-    rawCtx.translate(raw.width, 0);
-    rawCtx.scale(-1, 1);
-    rawCtx.drawImage(video, 0, 0, raw.width, raw.height);
-
-    const previewIsPortrait = isPortraitBox($('camera-wrap'));
-    const frameIsLandscape = raw.width > raw.height;
-    if (!(previewIsPortrait && frameIsLandscape)) {
-      return raw; // shape already matches what the guest saw — nothing to fix
-    }
-
-    const fixed = document.createElement('canvas');
-    fixed.width = raw.height;
-    fixed.height = raw.width;
-    const ctx = fixed.getContext('2d');
-    ctx.translate(fixed.width / 2, fixed.height / 2);
-    ctx.rotate((ROTATE_LANDSCAPE_FRAMES_CLOCKWISE ? 90 : -90) * (Math.PI / 180));
-    ctx.drawImage(raw, -raw.width / 2, -raw.height / 2);
-    return fixed;
+    ctx.translate(canvas.width, 0);
+    ctx.scale(-1, 1);
+    ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+    return canvas;
   }
 
   /** Footer height in px for a canvas of the given width — see FOOTER_HEIGHT_RATIO. */
