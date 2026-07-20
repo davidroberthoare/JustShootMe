@@ -1,11 +1,12 @@
-# The docroot has both index.html (kiosk landing page) and index.php (Slim
-# front controller) side by side. Without this, "/" is ambiguous — some
-# Apache configs default to preferring index.php, which would silently route
-# straight into Slim's 404 handler (no "/" route exists there on purpose)
-# instead of the landing page.
-DirectoryIndex index.html index.php
-
 RewriteEngine On
+
+# The docroot has both index.html (kiosk landing page) and index.php (Slim
+# front controller) side by side, so "/" is ambiguous. Route it to
+# index.html explicitly via mod_rewrite rather than a DirectoryIndex
+# directive — DirectoryIndex needs "AllowOverride Indexes", which many
+# hardened vhosts don't grant, and an unpermitted directive makes Apache
+# treat the whole .htaccess as invalid (500 on every request, not just "/").
+RewriteRule ^$ index.html [L]
 
 # Serve real files/directories (static booth/admin/photo pages, assets) directly.
 RewriteCond %{REQUEST_FILENAME} -f [OR]
