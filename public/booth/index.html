@@ -16,6 +16,11 @@
   sibling ".screen" div, and booth.js shows exactly one at a time by
   toggling the "is-active" class (see showScreen() in booth.js).
 -->
+
+<!-- Deliberately tiny/unlabelled, always on top of every screen — a discreet
+     way for staff to reach the admin login without a guest noticing it. -->
+<button class="kiosk-exit-btn" id="kiosk-exit-btn" aria-label="Admin"></button>
+
 <div class="booth-shell" id="booth-shell">
 
   <div class="screen screen--centered is-active" id="screen-loading">
@@ -24,6 +29,10 @@
 
   <div class="screen screen--centered" id="screen-error">
     <p class="notification is-danger" id="error-message">Something went wrong.</p>
+    <button class="button" id="error-different-code-btn">
+      <span class="icon"><i class="ph ph-arrow-counter-clockwise"></i></span>
+      <span>Enter a different code</span>
+    </button>
   </div>
 
   <div class="screen screen--centered" id="screen-full">

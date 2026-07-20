@@ -1,6 +1,9 @@
 /**
- * Guest-facing booth flow. Loaded by public/booth/index.html with a
- * `?code=XXXX-XXXX` query string identifying the event (see
+ * Guest-facing booth flow. Loaded by public/booth/index.html, identifying
+ * the event either via a `?code=XXXX-XXXX` query string or — once a code has
+ * been confirmed valid once — a remembered code in localStorage (see
+ * BOOTH_CODE_KEY below), so a kiosk tablet boots straight back into its
+ * booth on reload without the URL needing the code every time (see
  * EventController::publicConfig / PhotoController::upload on the backend).
  *
  * This is a plain state machine over a handful of full-screen ".screen"
@@ -22,8 +25,13 @@
     screens.forEach((s) => s.classList.toggle('is-active', s.id === id));
   }
 
+  // Same key landing.js reads/writes — once a code is confirmed valid here,
+  // remember it so this device (tablet/kiosk) boots straight into this booth
+  // next time, without anyone having to re-type or re-scan the code.
+  const BOOTH_CODE_KEY = 'jsm_booth_code';
+
   const params = new URLSearchParams(window.location.search);
-  const boothCode = params.get('code');
+  const boothCode = params.get('code') || localStorage.getItem(BOOTH_CODE_KEY);
 
   // Single-photo output: sized to match whatever the live preview box
   // actually looks like on this device (see compositeSingle) — WYSIWYG,
@@ -52,7 +60,7 @@
   /** Fetches this event's branding + status and shows the right first screen. */
   async function loadConfig() {
     if (!boothCode) {
-      showError('No booth code was provided in the URL. Ask your event host for the correct link.');
+      showError('No booth code was provided. Ask your event host for the correct link.');
       return;
     }
     try {
@@ -60,6 +68,8 @@
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || 'Could not load this event.');
       event = data.event;
+      // Confirmed valid by the server — safe to remember for next time.
+      localStorage.setItem(BOOTH_CODE_KEY, boothCode);
 
       // Branding is baked in by the admin at event setup, not editable by guests (spec).
       const shell = $('booth-shell');
@@ -449,6 +459,24 @@
     } catch (err) {
       $('email-status').textContent = err.message;
     }
+  });
+
+  // Deliberately unlabelled and low-opacity (see booth.css .kiosk-exit-btn) —
+  // guests shouldn't notice it, but an accidental tap must never trap them:
+  // it only asks for confirmation and opens the admin login, it never signs
+  // anyone out or clears the remembered booth code.
+  $('kiosk-exit-btn').addEventListener('click', () => {
+    if (confirm('Leave the booth and open the admin login?')) {
+      window.location.href = '/admin/';
+    }
+  });
+
+  // Recovery path if the remembered/linked code stops working (event
+  // deleted or expired) — without this, a kiosk that only ever sees this
+  // code would be stuck on the error screen forever.
+  $('error-different-code-btn').addEventListener('click', () => {
+    localStorage.removeItem(BOOTH_CODE_KEY);
+    window.location.href = '/';
   });
 
   loadConfig();

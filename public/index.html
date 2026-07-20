@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>JustShootMe</title>
+<meta name="robots" content="noindex">
+<link rel="stylesheet" href="/assets/vendor/bulma/bulma.min.css">
+<link rel="stylesheet" href="/assets/vendor/phosphor/regular/style.css">
+<link rel="stylesheet" href="/assets/css/landing.css">
+</head>
+<body>
+
+<div class="landing-shell">
+  <div class="box landing-card has-text-centered">
+    <i class="ph ph-camera landing-icon"></i>
+    <h1 class="title is-3">JustShootMe</h1>
+    <p class="subtitle is-6 mb-5">Enter your event's booth code to get started.</p>
+
+    <form id="code-form">
+      <div class="field">
+        <div class="control">
+          <input class="input is-large has-text-centered" type="text" id="code-input"
+                 placeholder="XXXX-XXXX" autocapitalize="characters" autocomplete="off"
+                 autocorrect="off" spellcheck="false" required>
+        </div>
+      </div>
+      <div class="field mt-4">
+        <button type="submit" class="button is-primary is-large is-fullwidth">
+          <span class="icon"><i class="ph ph-arrow-right"></i></span>
+          <span>Go</span>
+        </button>
+      </div>
+    </form>
+
+    <p class="mt-6">
+      <a href="/admin/" class="is-size-7 has-text-grey">
+        <i class="ph ph-lock-key mr-1"></i>Event host? Admin login
+      </a>
+    </p>
+  </div>
+</div>
+
+<script src="/assets/js/landing.js"></script>
+</body>
+</html>

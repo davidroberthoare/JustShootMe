@@ -1,3 +1,10 @@
+# The docroot has both index.html (kiosk landing page) and index.php (Slim
+# front controller) side by side. Without this, "/" is ambiguous — some
+# Apache configs default to preferring index.php, which would silently route
+# straight into Slim's 404 handler (no "/" route exists there on purpose)
+# instead of the landing page.
+DirectoryIndex index.html index.php
+
 RewriteEngine On
 
 # Serve real files/directories (static booth/admin/photo pages, assets) directly.

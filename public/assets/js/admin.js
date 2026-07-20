@@ -39,6 +39,21 @@
 
   const $ = (id) => document.getElementById(id);
 
+  // Same key landing.js/booth.js use to remember the booth this device is
+  // provisioned for — lets "Back to Booth" here return to it without the
+  // admin having to know/re-enter the code, and without ever getting stuck
+  // in the admin UI after an accidental trip here from the kiosk.
+  const BOOTH_CODE_KEY = 'jsm_booth_code';
+
+  function boothOrHomeUrl() {
+    const code = localStorage.getItem(BOOTH_CODE_KEY);
+    return code ? `/booth/?code=${encodeURIComponent(code)}` : '/';
+  }
+
+  [$('login-back-to-booth'), $('dashboard-back-to-booth')].forEach((el) => {
+    el.href = boothOrHomeUrl();
+  });
+
   const loginView = $('login-view');
   const dashboardView = $('dashboard-view');
   const eventsListView = $('events-list-view');

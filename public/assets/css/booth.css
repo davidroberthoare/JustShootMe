@@ -206,6 +206,25 @@ html, body {
     }
 }
 
+/* Discreet corner tap target for staff to reach the admin login (see
+   booth.js #kiosk-exit-btn) — sized for a deliberate tap, but visually
+   near-invisible so guests don't notice or poke at it. Sits above every
+   .screen regardless of which is active. */
+.kiosk-exit-btn {
+    position: fixed;
+    top: env(safe-area-inset-top);
+    right: env(safe-area-inset-right);
+    width: 56px;
+    height: 56px;
+    padding: 0;
+    margin: 0;
+    border: none;
+    background: transparent;
+    opacity: 0;
+    z-index: 999;
+    cursor: default;
+}
+
 /* Slim, semi-transparent bar over the bottom of the camera/preview screens —
    keeps controls reachable by thumb without boxing the photo into a card. */
 .controls-bar {
