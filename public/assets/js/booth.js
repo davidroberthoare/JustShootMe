@@ -181,11 +181,15 @@
 
   /** Best-effort live preview behind the start screen — decorative only, so any failure (permission denied, no camera) is swallowed and just leaves the plain background colour. */
   async function startPreviewCamera() {
+    console.log("Starting preview camera for booth code:", boothCode);
     try {
       await startCamera();
     } catch (err) {
       // Nothing to show for it — the actual capture flow will surface a
       // real error itself if the guest goes on to tap a capture button.
+      // Logged (not swallowed silently) purely to help diagnose why the
+      // decorative preview didn't come up on a given device/browser.
+      console.error('startPreviewCamera failed:', err);
     }
   }
 
@@ -468,6 +472,16 @@
     stopCamera();
     goToStart();
   }
+
+  // Some browsers (notably iOS Safari) silently refuse getUserMedia() when it
+  // isn't called from within a user gesture, which is exactly how
+  // startPreviewCamera() calls it from goToStart() — so on those browsers the
+  // decorative preview never appears until a mode button is tapped (and even
+  // then only because that tap is itself a gesture). Retrying on the very
+  // first tap anywhere on the welcome screen covers that gap: startCamera()
+  // is a no-op once a stream is already open, so this never re-prompts or
+  // restarts an autoplay that already succeeded.
+  $('screen-start').addEventListener('click', () => { startPreviewCamera(); });
 
   $('choose-single').addEventListener('click', () => runCaptureFlow('single'));
   $('choose-strip').addEventListener('click', () => runCaptureFlow('strip'));
