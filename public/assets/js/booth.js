@@ -96,11 +96,30 @@
       $('event-name').textContent = event.name;
       goToStart();
     } catch (err) {
-      showError(err.message);
+      // fetch() itself throws a TypeError when the request never reaches a
+      // server (offline, DNS failure, etc.) — distinct from the plain Error
+      // thrown two lines up when the server responds but rejects the code.
+      // Worth telling apart: "no network" shouldn't send a guest/kiosk back
+      // to re-enter a perfectly good remembered code (see errorRetry below).
+      if (err instanceof TypeError) {
+        showError("You're offline. Check your connection and try again.", loadConfig);
+      } else {
+        showError(err.message);
+      }
     }
   }
 
-  function showError(message) {
+  // Set by showError() when the error screen's button should retry whatever
+  // failed instead of its default "forget the code, go re-enter one" action
+  // — see the offline case above and uploadPhoto's below.
+  let errorRetry = null;
+
+  function showError(message, retry) {
+    errorRetry = retry || null;
+    const btn = $('error-different-code-btn');
+    btn.innerHTML = retry
+      ? '<span class="icon"><i class="ph ph-arrow-clockwise"></i></span><span>Retry</span>'
+      : '<span class="icon"><i class="ph ph-arrow-counter-clockwise"></i></span><span>Enter a different code</span>';
     $('error-message').textContent = message;
     showScreen('screen-error');
   }
@@ -450,7 +469,15 @@
       showScreen('screen-delivery');
       loadQr(lastPhotoUuid);
     } catch (err) {
-      showError(err.message);
+      // Same offline-vs-real-error split as loadConfig() — and doubly
+      // important here, since the default error-screen button would
+      // otherwise throw away the guest's already-captured photo along with
+      // the "wrong" code.
+      if (err instanceof TypeError) {
+        showError("You're offline. Check your connection and try again.", () => uploadPhoto(type, dataUrl));
+      } else {
+        showError(err.message);
+      }
     }
   }
 
@@ -531,8 +558,15 @@
 
   // Recovery path if the remembered/linked code stops working (event
   // deleted or expired) — without this, a kiosk that only ever sees this
-  // code would be stuck on the error screen forever.
+  // code would be stuck on the error screen forever. When the error was
+  // just "offline" though, showError() points errorRetry at the failed
+  // operation instead, so this retries it rather than discarding a
+  // perfectly good code (or an already-captured photo).
   $('error-different-code-btn').addEventListener('click', () => {
+    if (errorRetry) {
+      errorRetry();
+      return;
+    }
     localStorage.removeItem(BOOTH_CODE_KEY);
     window.location.href = '/';
   });

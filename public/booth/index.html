@@ -9,6 +9,21 @@
 <link rel="stylesheet" href="/assets/vendor/bulma/bulma.min.css">
 <link rel="stylesheet" href="/assets/vendor/phosphor/regular/style.css">
 <link rel="stylesheet" href="/assets/css/booth.css">
+
+<!--
+  This is the page meant to be installed/added-to-homescreen on a kiosk
+  tablet (see manifest.json's start_url) — booth.js remembers the booth
+  code in localStorage, so relaunching from a homescreen icon boots
+  straight back into this same event's booth without re-entering a code.
+-->
+<link rel="manifest" href="/manifest.json">
+<meta name="theme-color" content="#00d1b2">
+<link rel="icon" type="image/png" sizes="32x32" href="/assets/icons/favicon-32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/assets/icons/favicon-16.png">
+<link rel="apple-touch-icon" href="/assets/icons/apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="JustShootMe">
 </head>
 <body>
 <!--
@@ -150,5 +165,10 @@
 <img id="print-image" class="is-hidden">
 
 <script src="/assets/js/booth.js"></script>
+<script>
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => navigator.serviceWorker.register('/sw.js'));
+}
+</script>
 </body>
 </html>
